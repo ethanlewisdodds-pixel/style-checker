@@ -565,9 +565,6 @@ const RULES = [
   { id:'s37', category:'Spelling', severity:'ERROR',
     find: /\btee[- ]shirt\b/gi,
     message: 'Use "T-shirt" not "tee-shirt"' },
-  { id:'s38', category:'Spelling', severity:'ERROR',
-    find: /\bamidst\b/gi,
-    message: 'Use "amid" not "amidst"' },
   { id:'s39', category:'Spelling', severity:'WARNING',
     find: /\bprogram\b/gi,
     message: 'Use "programme" except for software/computer context' },
@@ -1580,7 +1577,17 @@ function runChecks(text) {
     return a.index - b.index;
   });
 
-  return findings;
+  const dedupedFindings = [];
+  const seenFindingKeys = new Set();
+
+  findings.forEach(item => {
+    const key = `${item.severity}::${item.message}::${item.index}::${item.found.toLowerCase()}`;
+    if (seenFindingKeys.has(key)) return;
+    seenFindingKeys.add(key);
+    dedupedFindings.push(item);
+  });
+
+  return dedupedFindings;
 }
 
 // ─────────────────────────────────────────────────────────────
