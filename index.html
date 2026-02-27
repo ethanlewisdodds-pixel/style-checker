@@ -1847,7 +1847,7 @@ function renderHighlightedText(text, findings) {
     html += escHtml(text.slice(pos, s.start));
     const issueId = `issue-${s.ruleId}-${s.index}`;
     const word = escHtml(text.slice(s.start, s.end));
-    html += `<span class="hl-${s.severity}" data-issue-id="${issueId}" onclick="jumpToIssue('${issueId}', this)">${word}</span>`;
+    html += `<span class="hl-${s.severity}" data-issue-id="${issueId}">${word}</span>`;
     pos = s.end;
   });
 
@@ -1899,6 +1899,15 @@ function jumpToIssue(issueId, spanEl) {
     document.getElementById('statusText').textContent =
       `Could not jump to ${issueId}. Try running Check again.`;
   }
+}
+
+const previewArea = document.getElementById('previewArea');
+if (previewArea && typeof previewArea.addEventListener === 'function') {
+  previewArea.addEventListener('click', (event) => {
+    const target = event.target.closest('[data-issue-id]');
+    if (!target || !previewArea.contains(target)) return;
+    jumpToIssue(target.dataset.issueId, target);
+  });
 }
 
 // ─────────────────────────────────────────────────────────────
