@@ -1808,11 +1808,29 @@ function jumpToIssue(issueId, spanEl) {
   // Highlight the span
   if (spanEl) spanEl.classList.add('hl-active');
 
+  // Ensure the issue is visible even if current filter hides it
+  let issueEl = document.getElementById(issueId);
+  if (!issueEl) {
+    const targetFinding = allFindings.find(f => `issue-${f.ruleId}-${f.index}` === issueId);
+
+    if (targetFinding && activeFilter !== targetFinding.severity) {
+      activeFilter = targetFinding.severity;
+      renderResults();
+    } else if (!targetFinding && activeFilter !== 'ALL') {
+      activeFilter = 'ALL';
+      renderResults();
+    }
+
+    issueEl = document.getElementById(issueId);
+  }
+
   // Scroll to and highlight the issue item
-  const issueEl = document.getElementById(issueId);
   if (issueEl) {
     issueEl.classList.add('active-issue');
     issueEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    document.getElementById('statusText').textContent =
+      `Could not jump to ${issueId}. Try running Check again.`;
   }
 }
 
