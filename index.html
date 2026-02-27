@@ -186,6 +186,16 @@
   .severity-badge.error { background: #fff0f0; color: var(--error); border: 1px solid #f0c0c0; }
   .severity-badge.warning { background: #fff8e0; color: var(--warning); border: 1px solid #e8d080; }
   .severity-badge.info { background: #f0f4ff; color: var(--info); border: 1px solid #c0ccf0; }
+  .confidence-badge {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 2px 6px; border-radius: 2px;
+    border: 1px solid var(--rule); color: var(--mid);
+    margin-left: 6px;
+  }
+  .confidence-badge.high { border-color: #7bbf8a; color: #1f6a32; background: #eef9f1; }
+  .confidence-badge.medium { border-color: #d8c16d; color: #7a5a00; background: #fff9e6; }
+  .confidence-badge.low { border-color: #b8c6e8; color: #34507d; background: #eef3ff; }
   .issue-text { font-size: 14px; line-height: 1.55; color: var(--ink); margin-bottom: 3px; }
   .issue-found {
     font-family: 'DM Mono', monospace; font-size: 11px;
@@ -1361,41 +1371,196 @@ RULES.push(...SUPPLEMENTAL_RULES);
 // CHECKER ENGINE
 // ─────────────────────────────────────────────────────────────
 
+// Utility helpers for context-aware checks
+function makeContext(text, index, foundLen) {
+  const start = Math.max(0, index - 60);
+  const end = Math.min(text.length, index + foundLen + 60);
+  let context = text.slice(start, end).replace(/\n/g, ' ').trim();
+  if (start > 0) context = '…' + context;
+  if (end < text.length) context = context + '…';
+  return context;
+}
+
+function isInsideDoubleQuotes(text, index) {
+  const prior = text.slice(0, index);
+  const count = (prior.match(/"/g) || []).length;
+  return count % 2 === 1;
+}
+
+function isSoftwareContext(text, index) {
+  const scope = text.slice(Math.max(0, index - 50), Math.min(text.length, index + 90)).toLowerCase();
+  return /(software|computer|coding|codebase|application|app|developer|developers|programming|javascript|python|java|c\+\+|script)/.test(scope);
+}
+
+const RULE_CONFIDENCE = {
+  p03: 'high', p04: 'high', p05: 'high', n01: 'high',
+  s34: 'high', s35: 'high', sx11: 'high', sx23: 'high', sx22: 'high',
+  sx26: 'medium', c22: 'medium', c23: 'medium', c24: 'medium', c25: 'medium'
+};
+
+const RULE_GUARDS = {
+  sx01: (match, text) => !isInsideDoubleQuotes(text, match.index),
+  s39: (match, text) => !isSoftwareContext(text, match.index)
+};
+
+function getConfidence(ruleId, severity) {
+  if (RULE_CONFIDENCE[ruleId]) return RULE_CONFIDENCE[ruleId];
+  if (severity === 'ERROR') return 'high';
+  if (severity === 'WARNING') return 'medium';
+  return 'low';
+}
+
+function runGrammarChecks(text) {
+  const grammarRules = [
+    { id: 'g01', find: /\b(\w+)\s+\b/gi, message: 'Possible duplicated word', severity: 'WARNING' },
+    { id: 'g02', find: /\b(could|would|should|must)\s+of\b/gi, message: 'Use "have", not "of" after modal verbs (eg "could have")', severity: 'ERROR' },
+    { id: 'g03', find: /\bthere\s+is\s+(many|several|two|three|four|five|\d+)/gi, message: 'Possible agreement issue: consider "there are"', severity: 'WARNING' },
+    { id: 'g04', find: /\bless\s+(people|workers|children|years|items|cases|members|MPs)\b/gi, message: 'Consider "fewer" for countable nouns', severity: 'INFO' }
+  ];
+
+  const results = [];
+  grammarRules.forEach(rule => {
+    const regex = new RegExp(rule.find.source, rule.find.flags);
+    let m;
+    while ((m = regex.exec(text)) !== null) {
+      results.push({
+        ruleId: rule.id,
+        category: 'Grammar',
+        severity: rule.severity,
+        confidence: getConfidence(rule.id, rule.severity),
+        found: m[0],
+        context: makeContext(text, m.index, m[0].length),
+        message: rule.message,
+        index: m.index
+      });
+    }
+  });
+  return results;
+}
+
+function runAcronymFirstMentionChecks(text) {
+  const checks = [
+    { short: /\bEU\b/g, full: /European Union/i, message: 'Spell out "European Union" on first mention, then EU', id: 'ac01' },
+    { short: /\bUK\b/g, full: /United Kingdom/i, message: 'Spell out "United Kingdom" on first mention, then UK', id: 'ac02' },
+    { short: /\bUS\b/g, full: /United States/i, message: 'Spell out "United States" on first mention, then US', id: 'ac03' }
+  ];
+
+  const findings = [];
+  checks.forEach(c => {
+    const shortMatch = c.short.exec(text);
+    c.short.lastIndex = 0;
+    const fullMatch = c.full.exec(text);
+    if (shortMatch && (!fullMatch || shortMatch.index < fullMatch.index)) {
+      findings.push({
+        ruleId: c.id,
+        category: 'Acronyms',
+        severity: 'WARNING',
+        confidence: 'medium',
+        found: shortMatch[0],
+        context: makeContext(text, shortMatch.index, shortMatch[0].length),
+        message: c.message,
+        index: shortMatch.index
+      });
+    }
+  });
+  return findings;
+}
+
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+    }
+  }
+  return dp[m][n];
+}
+
+function runTypoChecks(text) {
+  const dictionary = ['Thérèse','Coffey','antisemitism','antisemitic','policymaking','policymaker','taskforce','postmortem','Partygate','Crown Court','Supreme Court'];
+  const findings = [];
+  const tokenRe = /\b[A-Za-z][A-Za-z-]{3,}\b/g;
+  let m;
+  while ((m = tokenRe.exec(text)) !== null) {
+    const token = m[0];
+    if (/^[A-Z]{2,}$/.test(token)) continue;
+    const normalized = token.toLowerCase();
+    let best = null;
+    for (const word of dictionary) {
+      const target = word.toLowerCase().replace(/[^a-z]/g, '');
+      const cand = normalized.replace(/[^a-z]/g, '');
+      if (!target || !cand) continue;
+      const dist = levenshtein(cand, target);
+      const max = cand.length >= 8 ? 2 : 1;
+      if (dist > 0 && dist <= max) {
+        if (!best || dist < best.dist) best = { word, dist };
+      }
+    }
+    if (best) {
+      findings.push({
+        ruleId: 'ty01',
+        category: 'Typos',
+        severity: 'INFO',
+        confidence: 'low',
+        found: token,
+        context: makeContext(text, m.index, token.length),
+        message: `Possible typo — did you mean "${best.word}"?`,
+        index: m.index
+      });
+    }
+  }
+  return findings;
+}
+
 function runChecks(text) {
   const findings = [];
-  const seenMatches = new Set(); // avoid duplicates
+  const seenMatches = new Set();
 
   RULES.forEach(rule => {
-    rule.find.lastIndex = 0; // reset regex state
+    rule.find.lastIndex = 0;
     let match;
     const regex = new RegExp(rule.find.source, rule.find.flags);
 
     while ((match = regex.exec(text)) !== null) {
+      const guard = RULE_GUARDS[rule.id];
+      if (guard && !guard(match, text)) continue;
+
       const found = match[0];
-      const key = rule.id + '::' + found.toLowerCase();
+      const key = `${rule.id}::${found.toLowerCase()}::${match.index}`;
       if (seenMatches.has(key)) continue;
       seenMatches.add(key);
-
-      // Get surrounding context (up to 80 chars each side)
-      const start = Math.max(0, match.index - 60);
-      const end = Math.min(text.length, match.index + found.length + 60);
-      let context = text.slice(start, end).replace(/\n/g, ' ').trim();
-      if (start > 0) context = '…' + context;
-      if (end < text.length) context = context + '…';
 
       findings.push({
         ruleId: rule.id,
         category: rule.category,
         severity: rule.severity,
+        confidence: getConfidence(rule.id, rule.severity),
         found,
-        context,
+        context: makeContext(text, match.index, found.length),
         message: rule.message,
         index: match.index
       });
     }
   });
 
-  // Sort: errors first, then warnings, then info; then by position in text
+  const extra = [
+    ...runGrammarChecks(text),
+    ...runAcronymFirstMentionChecks(text),
+    ...runTypoChecks(text)
+  ];
+
+  extra.forEach(item => {
+    const key = `${item.ruleId}::${item.found.toLowerCase()}::${item.index}`;
+    if (!seenMatches.has(key)) {
+      seenMatches.add(key);
+      findings.push(item);
+    }
+  });
+
   const order = { ERROR: 0, WARNING: 1, INFO: 2 };
   findings.sort((a, b) => {
     if (order[a.severity] !== order[b.severity]) return order[a.severity] - order[b.severity];
@@ -1481,10 +1646,15 @@ function renderResults() {
   const warnings = allFindings.filter(f => f.severity === 'WARNING').length;
   const infos = allFindings.filter(f => f.severity === 'INFO').length;
 
-  const filtered = activeFilter === 'ALL' ? allFindings :
-    allFindings.filter(f => f.severity === activeFilter);
+  const filtered = activeFilter === 'ALL' ? allFindings : allFindings.filter(f => f.severity === activeFilter);
 
-  // Group by category
+  const groupedByMessage = {};
+  filtered.forEach(f => {
+    const key = `${f.severity}::${f.message}`;
+    groupedByMessage[key] = (groupedByMessage[key] || 0) + 1;
+  });
+  const repeated = Object.entries(groupedByMessage).filter(([, count]) => count > 1).slice(0, 5);
+
   const grouped = {};
   filtered.forEach(f => {
     if (!grouped[f.category]) grouped[f.category] = [];
@@ -1500,6 +1670,7 @@ function renderResults() {
         ${infos ? `<span class="count-pill info">${infos} Note${infos !== 1 ? 's' : ''}</span>` : ''}
       </div>
     </div>
+    ${repeated.length ? `<div class="note-box"><strong>Repeated issues:</strong> ${repeated.map(([k, v]) => `${v}× ${escHtml(k.split('::')[1])}`).join(' · ')}</div>` : ''}
     <div class="filter-bar">
       <span style="font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--mid);margin-right:4px;align-self:center;">Filter:</span>
       <button class="filter-btn ${activeFilter==='ALL'?'active':''}" data-filter="ALL" onclick="setFilter('ALL')">All (${allFindings.length})</button>
@@ -1516,13 +1687,11 @@ function renderResults() {
       html += `<div class="section-divider">${cat} — ${items.length} issue${items.length!==1?'s':''}</div>`;
       items.forEach(item => {
         const sevLabel = { ERROR: '● Error', WARNING: '◆ Check', INFO: '○ Note' }[item.severity];
-        const ctx = escHtml(item.context).replace(
-          escHtml(item.found),
-          `<mark class="highlight">${escHtml(item.found)}</mark>`
-        );
+        const conf = (item.confidence || 'medium').toLowerCase();
+        const ctx = escHtml(item.context).replace(escHtml(item.found), `<mark class="highlight">${escHtml(item.found)}</mark>`);
         html += `
           <div class="issue-item" id="issue-${item.ruleId}-${item.index}">
-            <div><span class="severity-badge ${item.severity.toLowerCase()}">${sevLabel}</span></div>
+            <div><span class="severity-badge ${item.severity.toLowerCase()}">${sevLabel}</span><span class="confidence-badge ${conf}">${conf} confidence</span></div>
             <div>
               <p class="issue-text">${escHtml(item.message)}</p>
               <div class="issue-found">Found: "${escHtml(item.found)}"</div>
@@ -1658,7 +1827,7 @@ function copyResults() {
     lines.push(`── ${cat.toUpperCase()} ──`);
     items.forEach(item => {
       const sev = { ERROR: '● Error', WARNING: '◆ Check', INFO: '○ Note' }[item.severity];
-      lines.push(`${sev}: ${item.message}`);
+      lines.push(`${sev} [${(item.confidence||'medium').toUpperCase()}]: ${item.message}`);
       lines.push(`  Found: "${item.found}"`);
       lines.push(`  Context: ${item.context}`);
       lines.push('');
