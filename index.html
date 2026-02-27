@@ -145,44 +145,6 @@
   .status-dot.done { background: var(--success); }
   .results-area { min-height: 400px; }
 
-  /* TABS */
-  .tab-nav {
-    display: flex; border-bottom: 2px solid var(--gold);
-    background: var(--ink);
-  }
-  .tab-btn {
-    font-family: 'DM Mono', monospace; font-size: 11px;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    padding: 11px 20px; cursor: pointer;
-    border: none; background: none;
-    color: rgba(245,240,232,0.45);
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px; transition: all 0.15s;
-  }
-  .tab-btn:hover { color: var(--cream); }
-  .tab-btn.active { color: var(--gold-light); border-bottom-color: var(--gold); }
-  .tab-pane { display: none; }
-  .tab-pane.active { display: block; }
-
-  /* SPINNER */
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .spinner {
-    width: 14px; height: 14px;
-    border: 2px solid rgba(107,93,79,0.3);
-    border-top-color: var(--mid);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    display: inline-block; vertical-align: middle; margin-right: 6px;
-  }
-
-  .lt-loading {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    min-height: 300px; gap: 14px; color: var(--mid);
-  }
-  .lt-loading p { font-style: italic; font-size: 14px; }
-
-  .grammar-category { font-size: 12px; color: var(--mid); margin-top: 3px; font-style: italic; }
   .empty-state {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
@@ -415,7 +377,7 @@
           <button class="clear-btn" onclick="clearAll()">Clear</button>
         </div>
         <button class="check-btn" onclick="checkArticle()">
-          <span>🔍</span> Check Style Guide &amp; Grammar
+          <span>🔍</span> Check Against Style Guide
         </button>
       </div>
     </div>
@@ -446,35 +408,18 @@
     </div>
   </div>
 
-  <!-- RIGHT: RESULTS (TABBED) -->
+  <!-- RIGHT: RESULTS -->
   <div class="panel">
     <div class="panel-header">
-      <h2>Results</h2>
+      <h2>⚠️ Style Issues</h2>
       <button class="export-btn" id="exportBtn" onclick="copyResults()" style="display:none;">📋 Copy Results</button>
       <span class="panel-header-label" id="resultsLabel">Awaiting check</span>
     </div>
-    <div class="tab-nav">
-      <button class="tab-btn active" id="tabBtnStyle" onclick="switchTab('style', event)">⚠️ Style Guide</button>
-      <button class="tab-btn" id="tabBtnGrammar" onclick="switchTab('grammar', event)">📝 Grammar</button>
-    </div>
 
-    <!-- STYLE TAB -->
-    <div id="tab-style" class="tab-pane active">
-      <div id="resultsArea" class="results-area">
-        <div class="empty-state">
-          <div class="empty-icon">📰</div>
-          <p>Paste your article on the left and click Check to scan for style guide violations.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- GRAMMAR TAB -->
-    <div id="tab-grammar" class="tab-pane">
-      <div id="grammarArea" class="results-area">
-        <div class="empty-state">
-          <div class="empty-icon">✍️</div>
-          <p>Click "Check Against Style Guide" to also run a grammar check via LanguageTool.</p>
-        </div>
+    <div id="resultsArea" class="results-area">
+      <div class="empty-state">
+        <div class="empty-icon">📰</div>
+        <p>Paste your article on the left and click Check to scan for style guide violations.</p>
       </div>
     </div>
   </div>
@@ -1459,13 +1404,6 @@ function clearAll() {
       <div class="empty-icon">📰</div>
       <p>Paste your article on the left and click Check to scan for style guide violations.</p>
     </div>`;
-  document.getElementById('grammarArea').innerHTML = `
-    <div class="empty-state">
-      <div class="empty-icon">✍️</div>
-      <p>Click "Check Style Guide &amp; Grammar" to also run a grammar check via LanguageTool.</p>
-    </div>`;
-  document.getElementById('tabBtnStyle').textContent = '⚠️ Style Guide';
-  document.getElementById('tabBtnGrammar').textContent = '📝 Grammar';
   allFindings = [];
 }
 
@@ -1473,37 +1411,22 @@ function checkArticle() {
   const text = document.getElementById('articleText').value;
   if (!text.trim()) { alert('Please paste an article to check.'); return; }
 
-  // Style check (instant)
   allFindings = runChecks(text);
   activeFilter = 'ALL';
   renderResults();
   renderHighlightedText(text, allFindings);
-
-  // Switch left panel to preview after check
   switchLeftTab('preview');
 
-  // Show export button
   document.getElementById('exportBtn').style.display = '';
-
-  // Update style tab count
-  const n = allFindings.length;
-  document.getElementById('tabBtnStyle').textContent = `⚠️ Style Guide${n ? ' (' + n + ')' : ''}`;
 
   const dot = document.getElementById('statusDot');
   dot.className = 'status-dot done';
+  const n = allFindings.length;
   document.getElementById('statusText').textContent =
-    n === 0 ? 'No style issues — grammar check running…' :
-    `${n} style issue${n !== 1 ? 's' : ''} found — grammar check running…`;
+    n === 0 ? 'No issues found — article looks clean!' :
+    `${n} issue${n !== 1 ? 's' : ''} found — review the flags on the right`;
   document.getElementById('resultsLabel').textContent =
-    n === 0 ? 'Style: clear' : `Style: ${n} issue${n !== 1 ? 's' : ''}`;
-
-  // Grammar check (async, via LanguageTool)
-  runGrammarCheck(text).then(() => {
-    const grammarCount = document.getElementById('grammarArea').querySelectorAll('.issue-item').length;
-    document.getElementById('tabBtnGrammar').textContent = `📝 Grammar${grammarCount ? ' (' + grammarCount + ')' : ''}`;
-    document.getElementById('statusText').textContent =
-      `Style: ${n} issue${n !== 1 ? 's' : ''} · Grammar: ${grammarCount} issue${grammarCount !== 1 ? 's' : ''}`;
-  });
+    n === 0 ? 'All clear' : `${n} issue${n !== 1 ? 's' : ''} found`;
 }
 
 function setFilter(f) {
@@ -1593,13 +1516,6 @@ function escHtml(s) {
 // ─────────────────────────────────────────────────────────────
 // TAB SWITCHER
 // ─────────────────────────────────────────────────────────────
-
-function switchTab(tab, e) {
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  if (e && e.currentTarget) e.currentTarget.classList.add('active');
-}
 
 function switchLeftTab(tab) {
   document.querySelectorAll('.left-tab-pane').forEach(p => p.classList.remove('active'));
@@ -1740,129 +1656,6 @@ function copyResults() {
     btn.textContent = '✓ Copied!';
     setTimeout(() => btn.textContent = orig, 2000);
   });
-}
-
-// ─────────────────────────────────────────────────────────────
-// LANGUAGETOOL GRAMMAR CHECK
-// ─────────────────────────────────────────────────────────────
-
-// Category labels for LanguageTool rule categories
-const LT_CATEGORY_LABELS = {
-  'GRAMMAR': 'Grammar',
-  'TYPOS': 'Spelling',
-  'PUNCTUATION': 'Punctuation',
-  'CASING': 'Capitalisation',
-  'REDUNDANCY': 'Redundancy',
-  'STYLE': 'Style',
-  'CONFUSED_WORDS': 'Confused Words',
-  'COLLOCATIONS': 'Word Choice',
-  'COMPOUNDING': 'Compounding',
-  'TYPOGRAPHY': 'Typography',
-  'MISC': 'Miscellaneous',
-};
-
-async function runGrammarCheck(text) {
-  const grammarArea = document.getElementById('grammarArea');
-  grammarArea.innerHTML = `
-    <div class="lt-loading">
-      <div class="spinner" style="width:28px;height:28px;border-width:3px;"></div>
-      <p>Checking grammar via LanguageTool…</p>
-    </div>`;
-
-  try {
-    const params = new URLSearchParams();
-    params.append('text', text);
-    params.append('language', 'en-GB');
-    // Disable rules that duplicate our style checker or are too noisy
-    params.append('disabledRules', 'WHITESPACE_RULE,EN_QUOTES,COMMA_PARENTHESIS_WHITESPACE,UPPERCASE_SENTENCE_START');
-
-    const resp = await fetch('https://api.languagetool.org/v2/check', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString()
-    });
-
-    if (!resp.ok) throw new Error('LanguageTool API returned ' + resp.status);
-    const data = await resp.json();
-    renderGrammarResults(data.matches || [], text);
-
-  } catch(err) {
-    grammarArea.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">⚠️</div>
-        <p>Grammar check failed. This feature requires an internet connection. Check your connection and try again.</p>
-        <p style="font-size:11px;margin-top:8px;opacity:0.5;">${err.message}</p>
-      </div>`;
-  }
-}
-
-function renderGrammarResults(matches, text) {
-  const grammarArea = document.getElementById('grammarArea');
-
-  if (matches.length === 0) {
-    grammarArea.innerHTML = `
-      <div class="all-clear">
-        <div class="all-clear-icon">✅</div>
-        <h3>No grammar issues!</h3>
-        <p>LanguageTool found no grammar or spelling errors in this article.</p>
-      </div>`;
-    return;
-  }
-
-  // Group by category
-  const grouped = {};
-  matches.forEach(m => {
-    const rawCat = m.rule && m.rule.category ? m.rule.category.id : 'MISC';
-    const cat = LT_CATEGORY_LABELS[rawCat] || rawCat;
-    if (!grouped[cat]) grouped[cat] = [];
-    grouped[cat].push(m);
-  });
-
-  let html = `
-    <div class="summary-banner">
-      <span class="summary-title">${matches.length} grammar issue${matches.length !== 1 ? 's' : ''} found</span>
-      <div class="summary-counts">
-        <span class="count-pill info" style="background:var(--info);">${matches.length} via LanguageTool</span>
-      </div>
-    </div>
-    <div class="issues-list">`;
-
-  Object.entries(grouped).forEach(([cat, items]) => {
-    html += `<div class="section-divider">${cat} — ${items.length} issue${items.length !== 1 ? 's' : ''}</div>`;
-    items.forEach(m => {
-      const offset = m.offset;
-      const len = m.length;
-      const found = text.slice(offset, offset + len);
-      const ctxStart = Math.max(0, offset - 55);
-      const ctxEnd = Math.min(text.length, offset + len + 55);
-      let ctx = text.slice(ctxStart, ctxEnd).replace(/\n/g, ' ').trim();
-      if (ctxStart > 0) ctx = '…' + ctx;
-      if (ctxEnd < text.length) ctx = ctx + '…';
-
-      const suggestions = m.replacements && m.replacements.length
-        ? m.replacements.slice(0, 3).map(r => `"${escHtml(r.value)}"`).join(', ')
-        : null;
-
-      const highlightedCtx = escHtml(ctx).replace(
-        escHtml(found),
-        `<mark class="highlight">${escHtml(found)}</mark>`
-      );
-
-      html += `
-        <div class="issue-item">
-          <div><span class="severity-badge warning">◆ Check</span></div>
-          <div>
-            <p class="issue-text">${escHtml(m.message)}</p>
-            ${found ? `<div class="issue-found">Found: "${escHtml(found)}"</div>` : ''}
-            ${suggestions ? `<p class="issue-rule" style="margin-top:4px;">Suggestion${m.replacements.length > 1 ? 's' : ''}: ${suggestions}</p>` : ''}
-            <p class="issue-context">${highlightedCtx}</p>
-          </div>
-        </div>`;
-    });
-  });
-
-  html += '</div>';
-  grammarArea.innerHTML = html;
 }
 </script>
 </body>
