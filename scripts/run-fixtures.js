@@ -20,6 +20,7 @@ const fixtures = JSON.parse(fs.readFileSync('tests/rules-fixtures.json', 'utf8')
 let failed = 0;
 
 for (const fx of fixtures) {
+  let fixtureFailed = 0;
   const findings = sandbox.runChecks(fx.text);
   const ids = new Set(findings.map(f => f.ruleId));
 
@@ -27,18 +28,20 @@ for (const fx of fixtures) {
     if (!ids.has(id)) {
       console.error(`[FAIL] ${fx.name}: missing expected rule ${id}`);
       failed++;
+      fixtureFailed++;
     }
   }
   for (const id of fx.expectAbsent || []) {
     if (ids.has(id)) {
       console.error(`[FAIL] ${fx.name}: unexpected rule ${id}`);
       failed++;
+      fixtureFailed++;
     }
   }
-  if (!(fx.expectPresent || []).length && !(fx.expectAbsent || []).length) {
+  if (fixtureFailed === 0) {
     console.log(`[OK] ${fx.name}`);
-  } else if (failed === 0) {
-    console.log(`[OK] ${fx.name}`);
+  } else {
+    console.error(`[FAIL] ${fx.name}: ${fixtureFailed} assertion${fixtureFailed === 1 ? '' : 's'} failed`);
   }
 }
 
