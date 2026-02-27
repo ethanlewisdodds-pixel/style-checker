@@ -1485,6 +1485,60 @@ function normalizeTypoToken(value) {
     .replace(/[^a-z]/g, '');
 }
 
+
+function preserveCase(original, replacement) {
+  if (original.toUpperCase() === original) return replacement.toUpperCase();
+  if (original[0] && original[0].toUpperCase() === original[0] && original.slice(1).toLowerCase() === original.slice(1)) {
+    return replacement[0].toUpperCase() + replacement.slice(1);
+  }
+  return replacement;
+}
+
+function runAmericanSpellingChecks(text) {
+  const americanToBritish = {
+    color: 'colour',
+    colors: 'colours',
+    favorite: 'favourite',
+    favorites: 'favourites',
+    honor: 'honour',
+    honored: 'honoured',
+    honoring: 'honouring',
+    labor: 'labour',
+    center: 'centre',
+    centers: 'centres',
+    defense: 'defence',
+    theater: 'theatre',
+    theaters: 'theatres',
+    traveling: 'travelling',
+    traveled: 'travelled',
+    canceled: 'cancelled',
+    counseling: 'counselling'
+  };
+
+  const findings = [];
+  const wordRe = /\b[A-Za-z]+\b/g;
+  let match;
+
+  while ((match = wordRe.exec(text)) !== null) {
+    const found = match[0];
+    const british = americanToBritish[found.toLowerCase()];
+    if (!british) continue;
+
+    findings.push({
+      ruleId: 'sx29',
+      category: 'Spelling',
+      severity: 'ERROR',
+      confidence: 'high',
+      found,
+      context: makeContext(text, match.index, found.length),
+      message: `Use UK spelling: "${preserveCase(found, british)}" not "${found}"`,
+      index: match.index
+    });
+  }
+
+  return findings;
+}
+
 function runTypoChecks(text) {
   const dictionary = ['Thérèse','Coffey','antisemitism','antisemitic','policymaking','policymaker','taskforce','postmortem','Partygate','Crown Court','Supreme Court'];
   const veryCommonShortWords = new Set(['these', 'those', 'there', 'three']);
@@ -1560,7 +1614,8 @@ function runChecks(text) {
   const extra = [
     ...runGrammarChecks(text),
     ...runAcronymFirstMentionChecks(text),
-    ...runTypoChecks(text)
+    ...runTypoChecks(text),
+    ...runAmericanSpellingChecks(text)
   ];
 
   extra.forEach(item => {
