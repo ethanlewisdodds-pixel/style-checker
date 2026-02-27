@@ -1802,11 +1802,16 @@ function renderHighlightedText(text, findings) {
 }
 
 function jumpToIssue(issueId, spanEl) {
-  // Switch to style tab on right
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-style').classList.add('active');
-  document.getElementById('tabBtnStyle').classList.add('active');
+  // Switch to style tab on right (if tab UI is present)
+  const styleTab = document.getElementById('tab-style');
+  const styleBtn = document.getElementById('tabBtnStyle');
+
+  if (styleTab && styleBtn) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    styleTab.classList.add('active');
+    styleBtn.classList.add('active');
+  }
 
   // Remove previous active highlights
   document.querySelectorAll('.issue-item.active-issue').forEach(el => el.classList.remove('active-issue'));
