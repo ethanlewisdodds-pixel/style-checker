@@ -516,13 +516,12 @@ const RULES = [
   { id:'s24', category:'Spelling', severity:'ERROR',
     find: /\brooves\b/gi,
     message: 'Use "roofs" not "rooves"' },
-  { id:'s25', category:'Spelling', severity:'ERROR',
-    find: /\bimpostor\b/gi,
-    message: '"Imposter" should be "impostor"',
-    note: 'Check: is it spelled "imposter"?' },
-  { id:'s26', category:'Spelling', severity:'ERROR',
+  { id:'s25', category:'Spelling', severity:'WARNING',
     find: /\bimposter\b/gi,
     message: 'Use "impostor" not "imposter"' },
+  { id:'s26', category:'Spelling', severity:'INFO',
+    find: /\bjudgement\b/gi,
+    message: 'Use "judgment" for legal term only; "judgement" for non-legal usage' },
   { id:'s27', category:'Spelling', severity:'ERROR',
     find: /\bfillibuster\b/gi,
     message: 'Use "filibuster" not "fillibuster"' },
@@ -544,25 +543,24 @@ const RULES = [
   { id:'s33', category:'Spelling', severity:'ERROR',
     find: /\banti-semitism\b|\bAnti-Semitism\b/gi,
     message: 'Use "antisemitism" (one word, lowercase s)' },
-  { id:'s34', category:'Spelling', severity:'ERROR',
-    find: /\bZelensky\b/g,
-    message: 'Check spelling: should be "Zelensky" — confirm this is correct',
-    note: 'Style guide specifies: Zelensky, Volodymyr' },
-  { id:'s35', category:'Spelling', severity:'WARNING',
+  { id:'s34', category:'Spelling', severity:'WARNING',
     find: /\bZelenskyy\b/g,
-    message: 'Style guide spells this as "Zelensky" (one y)' },
+    message: 'Use "Zelensky" (one y) per the style guide' },
+  { id:'s35', category:'Spelling', severity:'ERROR',
+    find: /\bTherese Coffey\b/g,
+    message: 'Use "Thérèse Coffey" (include accents)' },
   { id:'s36', category:'Spelling', severity:'ERROR',
-    find: /\bGandhi\b/g,
-    message: 'Check spelling: the style guide specifies "Gandhi"' },
+    find: /\bcelcius\b/gi,
+    message: 'Use "celsius" (spelling)' },
   { id:'s37', category:'Spelling', severity:'ERROR',
-    find: /\bGandhi/g,
-    message: 'Check spelling: should be "Gandhi"' },
+    find: /\btee[- ]shirt\b/gi,
+    message: 'Use "T-shirt" not "tee-shirt"' },
   { id:'s38', category:'Spelling', severity:'ERROR',
-    find: /\bPoliticsHome\b/g,
-    message: '"PoliticsHome" — confirm this capitalisation is correct per brand guidelines' },
+    find: /\bamidst\b/gi,
+    message: 'Use "amid" not "amidst"' },
   { id:'s39', category:'Spelling', severity:'WARNING',
-    find: /\b(programme|program)\b/gi,
-    message: 'Use "programme" for general use; "program" only for computer software' },
+    find: /\bprogram\b/gi,
+    message: 'Use "programme" except for software/computer context' },
 
   // ── WORD CHOICE ────────────────────────────────────────────
 
@@ -1328,6 +1326,36 @@ const RULES = [
     message: 'Use "allcomers" (one word)' },
 
 ];
+
+
+const SUPPLEMENTAL_RULES = [
+  { id:'sx01', category:'Word Choice', severity:'ERROR', find:/\ban historic\b/gi, message:'Use "a historic" (unless preserving a direct quote)' },
+  { id:'sx03', category:'Word Choice', severity:'WARNING', find:/\bchoice of two\b/gi, message:'Use "alternative" for two things; "choice" for three or more' },
+  { id:'sx04', category:'Word Choice', severity:'ERROR', find:/\bplanes\b/gi, message:'Use "aircraft" not "planes" in armed forces context' },
+  { id:'sx08', category:'Capitalisation', severity:'ERROR', find:/\bthe queen\b/g, message:'Use "the Queen"' },
+  { id:'sx09', category:'Capitalisation', severity:'ERROR', find:/\bthe king\b/g, message:'Use "the King" when referring to Charles III' },
+  { id:'sx10', category:'Capitalisation', severity:'ERROR', find:/\bhouse of commons library\b/gi, message:'Use "House of Commons Library"' },
+  { id:'sx11', category:'Capitalisation', severity:'ERROR', find:/\bcrown court\b/gi, message:'Use "Crown Court" (upper case)' },
+  { id:'sx12', category:'Capitalisation', severity:'ERROR', find:/\bsupreme court\b/gi, message:'Use "Supreme Court" (upper case)' },
+  { id:'sx13', category:'Capitalisation', severity:'ERROR', find:/\bautumn statement\b/gi, message:'Use "Autumn Statement" (upper case)' },
+  { id:'sx14', category:'Capitalisation', severity:'ERROR', find:/\bspring statement\b/gi, message:'Use "Spring Statement" (upper case)' },
+  { id:'sx16', category:'Hyphenation', severity:'ERROR', find:/\bunderway\b/gi, message:'Use "under way" (two words)' },
+  { id:'sx17', category:'Hyphenation', severity:'ERROR', find:/\bfrontbench\b/gi, message:'Use "front bench" / "front bencher" (two words)' },
+  { id:'sx18', category:'Hyphenation', severity:'ERROR', find:/\bback bencher\b/gi, message:'Use "backbencher" (one word)' },
+  { id:'sx19', category:'Hyphenation', severity:'ERROR', find:/\bpolicy[- ]maker\b|\bpolicy[- ]making\b/gi, message:'Use "policymaker" and "policymaking" (one word)' },
+  { id:'sx20', category:'Hyphenation', severity:'ERROR', find:/\btime frame\b/gi, message:'Use "timeframe" (one word)' },
+  { id:'sx21', category:'Hyphenation', severity:'ERROR', find:/\btime scale\b/gi, message:'Use "timescale" (one word)' },
+  { id:'sx22', category:'Hyphenation', severity:'ERROR', find:/\btask force\b/gi, message:'Use "taskforce" (one word)' },
+  { id:'sx23', category:'Hyphenation', severity:'ERROR', find:/\bpost mortem\b/gi, message:'Use "postmortem" (one word)' },
+  { id:'sx24', category:'Punctuation', severity:'ERROR', find:/\b\d{1,2}[-–]\d{1,2}[-–]year[- ]olds\b/gi, message:'Age ranges should be in style like "9- to 12-year-olds"' },
+  { id:'sx26', category:'Acronyms', severity:'WARNING', find:/\bEU\b|\bUK\b|\bUS\b/g, message:'On first mention, spell out European Union, United Kingdom and United States' },
+  { id:'sx27', category:'Word Choice', severity:'ERROR', find:/\bjuvenile courts\b/gi, message:'Use "youth courts"' },
+  { id:'sx28', category:'Word Choice', severity:'ERROR', find:/\bthe Yemen\b/g, message:'Use "Yemen" not "the Yemen"' },
+  { id:'sx29', category:'Word Choice', severity:'ERROR', find:/\bwelsh office\b/gi, message:'Use "Wales Office" not "Welsh Office"' },
+  { id:'sx30', category:'Word Choice', severity:'ERROR', find:/\bscottish office\b/gi, message:'Use "Scotland Office" not "Scottish Office"' }
+];
+
+RULES.push(...SUPPLEMENTAL_RULES);
 
 // ─────────────────────────────────────────────────────────────
 // CHECKER ENGINE
