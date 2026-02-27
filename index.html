@@ -1412,7 +1412,7 @@ function getConfidence(ruleId, severity) {
 
 function runGrammarChecks(text) {
   const grammarRules = [
-    { id: 'g01', find: /\b(\w+)\s+\b/gi, message: 'Possible duplicated word', severity: 'WARNING' },
+    { id: 'g01', find: /\b(\w+)\s+\1\b/gi, message: 'Possible duplicated word', severity: 'WARNING' },
     { id: 'g02', find: /\b(could|would|should|must)\s+of\b/gi, message: 'Use "have", not "of" after modal verbs (eg "could have")', severity: 'ERROR' },
     { id: 'g03', find: /\bthere\s+is\s+(many|several|two|three|four|five|\d+)/gi, message: 'Possible agreement issue: consider "there are"', severity: 'WARNING' },
     { id: 'g04', find: /\bless\s+(people|workers|children|years|items|cases|members|MPs)\b/gi, message: 'Consider "fewer" for countable nouns', severity: 'INFO' }
