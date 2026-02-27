@@ -282,6 +282,101 @@
     background: #ffe680; color: inherit;
     border-radius: 2px; padding: 0 1px;
   }
+
+  /* LEFT PANEL TABS */
+  .left-tab-nav {
+    display: flex; border-bottom: 1px solid var(--rule);
+    background: var(--parchment);
+  }
+  .left-tab-btn {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 8px 14px; cursor: pointer;
+    border: none; background: none;
+    color: var(--mid);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px; transition: all 0.15s;
+  }
+  .left-tab-btn:hover { color: var(--ink); }
+  .left-tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); background: white; }
+  .left-tab-pane { display: none; }
+  .left-tab-pane.active { display: block; }
+
+  /* HIGHLIGHTED PREVIEW */
+  .preview-area {
+    padding: 13px;
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 14px; line-height: 1.75;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    min-height: 400px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-y: auto;
+    max-height: 500px;
+  }
+  .preview-area .hl-error {
+    background: #ffd7d7;
+    border-bottom: 2px solid var(--error);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .preview-area .hl-warning {
+    background: #fff3cc;
+    border-bottom: 2px solid var(--warning);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .preview-area .hl-info {
+    background: #ddeeff;
+    border-bottom: 2px solid var(--info);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .preview-area .hl-error:hover { background: #ffb8b8; }
+  .preview-area .hl-warning:hover { background: #ffe480; }
+  .preview-area .hl-info:hover { background: #bbddff; }
+  .hl-active { outline: 2px solid var(--gold) !important; outline-offset: 1px; }
+
+  .preview-legend {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    padding: 8px 13px;
+    background: var(--parchment);
+    border: 1px solid var(--rule);
+    border-top: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; color: var(--mid);
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 1px;
+  }
+  .legend-dot.error { background: #ffd7d7; border-bottom: 2px solid var(--error); }
+  .legend-dot.warning { background: #fff3cc; border-bottom: 2px solid var(--warning); }
+  .legend-dot.info { background: #ddeeff; border-bottom: 2px solid var(--info); }
+
+  /* EXPORT BUTTON */
+  .export-btn {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 10px; border: 1px solid rgba(200,184,154,0.4);
+    background: none; color: var(--gold-light);
+    cursor: pointer; border-radius: 2px;
+    transition: all 0.15s; margin-left: auto;
+    white-space: nowrap;
+  }
+  .export-btn:hover { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+  .export-btn:active { transform: scale(0.97); }
+
+  /* ACTIVE ISSUE HIGHLIGHT in results panel */
+  .issue-item.active-issue {
+    background: #fffbe6;
+    border-left: 3px solid var(--gold);
+  }
 </style>
 </head>
 <body>
@@ -301,21 +396,50 @@
       <h2>📋 Article Input</h2>
       <span class="panel-header-label">Paste your copy</span>
     </div>
-    <div class="panel-body">
-      <label class="input-label" for="articleText">Article text</label>
-      <textarea
-        id="articleText"
-        placeholder="Paste your article text here…"
-        oninput="updateMeta()"
-      ></textarea>
-      <div class="meta-row">
-        <p class="char-count" id="charCount">0 words</p>
-        <button class="clear-btn" onclick="clearAll()">Clear</button>
-      </div>
-      <button class="check-btn" onclick="checkArticle()">
-        <span>🔍</span> Check Style Guide &amp; Grammar
-      </button>
+    <div class="left-tab-nav">
+      <button class="left-tab-btn active" id="leftTabEdit" onclick="switchLeftTab('edit')">✏️ Edit</button>
+      <button class="left-tab-btn" id="leftTabPreview" onclick="switchLeftTab('preview')">🔍 Preview</button>
     </div>
+
+    <!-- EDIT TAB -->
+    <div id="left-tab-edit" class="left-tab-pane active">
+      <div class="panel-body">
+        <label class="input-label" for="articleText">Article text</label>
+        <textarea
+          id="articleText"
+          placeholder="Paste your article text here…"
+          oninput="updateMeta()"
+        ></textarea>
+        <div class="meta-row">
+          <p class="char-count" id="charCount">0 words</p>
+          <button class="clear-btn" onclick="clearAll()">Clear</button>
+        </div>
+        <button class="check-btn" onclick="checkArticle()">
+          <span>🔍</span> Check Style Guide &amp; Grammar
+        </button>
+      </div>
+    </div>
+
+    <!-- PREVIEW TAB -->
+    <div id="left-tab-preview" class="left-tab-pane">
+      <div class="panel-body" style="padding-bottom:0;">
+        <label class="input-label">Highlighted article — click any highlight to jump to issue</label>
+        <div id="previewArea" class="preview-area">
+          <span style="color:var(--mid);font-style:italic;">Run a check to see highlighted issues here.</span>
+        </div>
+        <div class="preview-legend">
+          <span class="legend-item"><span class="legend-dot error"></span>Error</span>
+          <span class="legend-item"><span class="legend-dot warning"></span>Check</span>
+          <span class="legend-item"><span class="legend-dot info"></span>Note</span>
+        </div>
+      </div>
+      <div style="padding:0 18px 18px;">
+        <button class="check-btn" onclick="switchLeftTab('edit')" style="margin-top:12px;font-size:13px;padding:10px;">
+          ← Back to Edit
+        </button>
+      </div>
+    </div>
+
     <div class="status-bar">
       <div class="status-dot" id="statusDot"></div>
       <span id="statusText">Ready — paste article and click Check</span>
@@ -326,11 +450,12 @@
   <div class="panel">
     <div class="panel-header">
       <h2>Results</h2>
+      <button class="export-btn" id="exportBtn" onclick="copyResults()" style="display:none;">📋 Copy Results</button>
       <span class="panel-header-label" id="resultsLabel">Awaiting check</span>
     </div>
     <div class="tab-nav">
-      <button class="tab-btn active" onclick="switchTab('style')">⚠️ Style Guide</button>
-      <button class="tab-btn" onclick="switchTab('grammar')">📝 Grammar</button>
+      <button class="tab-btn active" id="tabBtnStyle" onclick="switchTab('style', event)">⚠️ Style Guide</button>
+      <button class="tab-btn" id="tabBtnGrammar" onclick="switchTab('grammar', event)">📝 Grammar</button>
     </div>
 
     <!-- STYLE TAB -->
@@ -1326,6 +1451,9 @@ function clearAll() {
   document.getElementById('statusDot').className = 'status-dot';
   document.getElementById('statusText').textContent = 'Ready — paste article and click Check';
   document.getElementById('resultsLabel').textContent = 'Awaiting check';
+  document.getElementById('exportBtn').style.display = 'none';
+  document.getElementById('previewArea').innerHTML = '<span style="color:var(--mid);font-style:italic;">Run a check to see highlighted issues here.</span>';
+  switchLeftTab('edit');
   document.getElementById('resultsArea').innerHTML = `
     <div class="empty-state">
       <div class="empty-icon">📰</div>
@@ -1336,6 +1464,8 @@ function clearAll() {
       <div class="empty-icon">✍️</div>
       <p>Click "Check Style Guide &amp; Grammar" to also run a grammar check via LanguageTool.</p>
     </div>`;
+  document.getElementById('tabBtnStyle').textContent = '⚠️ Style Guide';
+  document.getElementById('tabBtnGrammar').textContent = '📝 Grammar';
   allFindings = [];
 }
 
@@ -1347,10 +1477,20 @@ function checkArticle() {
   allFindings = runChecks(text);
   activeFilter = 'ALL';
   renderResults();
+  renderHighlightedText(text, allFindings);
+
+  // Switch left panel to preview after check
+  switchLeftTab('preview');
+
+  // Show export button
+  document.getElementById('exportBtn').style.display = '';
+
+  // Update style tab count
+  const n = allFindings.length;
+  document.getElementById('tabBtnStyle').textContent = `⚠️ Style Guide${n ? ' (' + n + ')' : ''}`;
 
   const dot = document.getElementById('statusDot');
   dot.className = 'status-dot done';
-  const n = allFindings.length;
   document.getElementById('statusText').textContent =
     n === 0 ? 'No style issues — grammar check running…' :
     `${n} style issue${n !== 1 ? 's' : ''} found — grammar check running…`;
@@ -1360,6 +1500,7 @@ function checkArticle() {
   // Grammar check (async, via LanguageTool)
   runGrammarCheck(text).then(() => {
     const grammarCount = document.getElementById('grammarArea').querySelectorAll('.issue-item').length;
+    document.getElementById('tabBtnGrammar').textContent = `📝 Grammar${grammarCount ? ' (' + grammarCount + ')' : ''}`;
     document.getElementById('statusText').textContent =
       `Style: ${n} issue${n !== 1 ? 's' : ''} · Grammar: ${grammarCount} issue${grammarCount !== 1 ? 's' : ''}`;
   });
@@ -1429,7 +1570,7 @@ function renderResults() {
           `<mark class="highlight">${escHtml(item.found)}</mark>`
         );
         html += `
-          <div class="issue-item">
+          <div class="issue-item" id="issue-${item.ruleId}-${item.index}">
             <div><span class="severity-badge ${item.severity.toLowerCase()}">${sevLabel}</span></div>
             <div>
               <p class="issue-text">${escHtml(item.message)}</p>
@@ -1453,11 +1594,152 @@ function escHtml(s) {
 // TAB SWITCHER
 // ─────────────────────────────────────────────────────────────
 
-function switchTab(tab) {
+function switchTab(tab, e) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
-  event.currentTarget.classList.add('active');
+  if (e && e.currentTarget) e.currentTarget.classList.add('active');
+}
+
+function switchLeftTab(tab) {
+  document.querySelectorAll('.left-tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.left-tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('left-tab-' + tab).classList.add('active');
+  document.getElementById('leftTab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────────────
+// HIGHLIGHTED TEXT PREVIEW
+// ─────────────────────────────────────────────────────────────
+
+function renderHighlightedText(text, findings) {
+  const preview = document.getElementById('previewArea');
+  if (!findings.length) {
+    preview.innerHTML = escHtml(text) + '\n\n<span style="color:var(--success);font-style:italic;">✓ No style issues found.</span>';
+    return;
+  }
+
+  // Build list of all match positions, sorted by start index
+  // Each: { start, end, severity, ruleId, index }
+  const spans = [];
+  findings.forEach(f => {
+    spans.push({
+      start: f.index,
+      end: f.index + f.found.length,
+      severity: f.severity.toLowerCase(),
+      ruleId: f.ruleId,
+      index: f.index
+    });
+  });
+  spans.sort((a, b) => a.start - b.start);
+
+  // Build HTML, merging overlapping spans by taking the most severe
+  let html = '';
+  let pos = 0;
+  const sevOrder = { error: 0, warning: 1, info: 2 };
+
+  // Merge overlapping intervals
+  const merged = [];
+  spans.forEach(s => {
+    if (merged.length && s.start < merged[merged.length-1].end) {
+      const last = merged[merged.length-1];
+      last.end = Math.max(last.end, s.end);
+      if (sevOrder[s.severity] < sevOrder[last.severity]) {
+        last.severity = s.severity;
+        last.ruleId = s.ruleId;
+        last.index = s.index;
+      }
+    } else {
+      merged.push({ ...s });
+    }
+  });
+
+  merged.forEach(s => {
+    // Text before this span
+    html += escHtml(text.slice(pos, s.start));
+    const issueId = `issue-${s.ruleId}-${s.index}`;
+    const word = escHtml(text.slice(s.start, s.end));
+    html += `<span class="hl-${s.severity}" data-issue-id="${issueId}" onclick="jumpToIssue('${issueId}', this)">${word}</span>`;
+    pos = s.end;
+  });
+
+  // Remaining text
+  html += escHtml(text.slice(pos));
+  preview.innerHTML = html;
+}
+
+function jumpToIssue(issueId, spanEl) {
+  // Switch to style tab on right
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-style').classList.add('active');
+  document.getElementById('tabBtnStyle').classList.add('active');
+
+  // Remove previous active highlights
+  document.querySelectorAll('.issue-item.active-issue').forEach(el => el.classList.remove('active-issue'));
+  document.querySelectorAll('.hl-active').forEach(el => el.classList.remove('hl-active'));
+
+  // Highlight the span
+  if (spanEl) spanEl.classList.add('hl-active');
+
+  // Scroll to and highlight the issue item
+  const issueEl = document.getElementById(issueId);
+  if (issueEl) {
+    issueEl.classList.add('active-issue');
+    issueEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// EXPORT / COPY RESULTS
+// ─────────────────────────────────────────────────────────────
+
+function copyResults() {
+  if (!allFindings.length) { alert('No issues to copy.'); return; }
+
+  const lines = [];
+  const now = new Date().toLocaleString('en-GB');
+  lines.push(`THE HOUSE & POLITICSHOME — STYLE GUIDE CHECK`);
+  lines.push(`Checked: ${now}`);
+  lines.push(`Total issues: ${allFindings.length}`);
+  lines.push('');
+
+  const grouped = {};
+  allFindings.forEach(f => {
+    if (!grouped[f.category]) grouped[f.category] = [];
+    grouped[f.category].push(f);
+  });
+
+  Object.entries(grouped).forEach(([cat, items]) => {
+    lines.push(`── ${cat.toUpperCase()} ──`);
+    items.forEach(item => {
+      const sev = { ERROR: '● Error', WARNING: '◆ Check', INFO: '○ Note' }[item.severity];
+      lines.push(`${sev}: ${item.message}`);
+      lines.push(`  Found: "${item.found}"`);
+      lines.push(`  Context: ${item.context}`);
+      lines.push('');
+    });
+  });
+
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('exportBtn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('exportBtn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
 }
 
 // ─────────────────────────────────────────────────────────────
