@@ -2,19 +2,39 @@
   {
     "name": "core style catches",
     "text": "Therese Coffey met Zelenskyy at 10:30pm in the crown court and proposed a task force post mortem in the Yemen.",
-    "expectPresent": ["s35", "s34", "p03", "sx11", "sx22", "sx23", "sx28"],
+    "expectPresent": [
+      "s35",
+      "s34",
+      "p03",
+      "sx11",
+      "sx22",
+      "sx23",
+      "sx28"
+    ],
     "expectAbsent": []
   },
   {
     "name": "program in software context should not fire",
     "text": "The software program runs nightly on a Python script.",
     "expectPresent": [],
-    "expectAbsent": ["s39"]
+    "expectAbsent": [
+      "s39"
+    ]
   },
   {
     "name": "first mention acronym",
     "text": "The EU announced changes today.",
-    "expectPresent": ["ac01"],
+    "expectPresent": [
+      "ac01"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "american spelling suggestions",
+    "text": "The Color Center honored a favorite labor organizer.",
+    "expectPresent": [
+      "sx29"
+    ],
     "expectAbsent": []
   }
 ]
