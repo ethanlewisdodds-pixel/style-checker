@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The House & PoliticsHome – Style Guide Checker</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231a3028'/><rect x='0' y='28' width='32' height='4' rx='2' fill='%23b8922a'/><text x='16' y='22' font-family='Georgia,serif' font-size='18' font-weight='900' fill='%23d4a843' text-anchor='middle'>H</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a3028;
+    --cream: #f5f0e8;
+    --parchment: #ede6d6;
+    --gold: #b8922a;
+    --gold-light: #d4a843;
+    --red: #8b1a1a;
+    --mid: #4a6358;
+    --rule: #a8c4b0;
+    --error: #7a1818;
+    --warning: #7a5a00;
+    --info: #1a3a5a;
+    --success: #1a4a2a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    min-height: 100vh;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(42,100,70,0.06) 27px, rgba(42,100,70,0.06) 28px);
+  }
+  .masthead {
+    background: var(--ink);
+    color: var(--cream);
+    text-align: center;
+    padding: 28px 24px 20px;
+    border-bottom: 4px solid var(--gold);
+  }
+  .masthead-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 10px;
+  }
+  .masthead h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(26px, 5vw, 50px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .masthead h1 span { color: var(--gold-light); }
+  .rule-ornament {
+    display: flex; align-items: center; gap: 12px;
+    justify-content: center; margin-top: 14px;
+  }
+  .rule-ornament::before, .rule-ornament::after {
+    content: ''; height: 1px; width: 80px;
+    background: var(--gold); opacity: 0.5;
+  }
+  .rule-ornament-diamond { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); }
+  .masthead-sub {
+    font-size: 13px; color: rgba(245,240,232,0.55);
+    margin-top: 10px; font-style: italic; font-weight: 300;
+  }
+  .container {
+    max-width: 1200px; margin: 0 auto;
+    padding: 32px 20px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px; align-items: start;
+  }
+  @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
+  .panel {
+    background: white; border: 1px solid var(--rule);
+    box-shadow: 4px 4px 0 var(--parchment), 5px 5px 0 var(--rule);
+  }
+  .panel-header {
+    background: var(--ink); color: var(--cream);
+    padding: 11px 16px; display: flex;
+    align-items: center; gap: 10px;
+    border-bottom: 2px solid var(--gold);
+  }
+  .panel-header h2 { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; }
+  .panel-header-label {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--gold-light); margin-left: auto;
+  }
+  .panel-body { padding: 18px; }
+  .input-label {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--mid); margin-bottom: 7px; display: block;
+  }
+  textarea {
+    width: 100%; height: 400px;
+    border: 1px solid var(--rule); background: var(--cream);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 14px; line-height: 1.75;
+    color: var(--ink); padding: 13px;
+    resize: vertical; outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--gold); }
+  textarea::placeholder { color: var(--mid); font-style: italic; }
+  .meta-row {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-top: 6px;
+  }
+  .char-count {
+    font-family: 'DM Mono', monospace; font-size: 10px; color: var(--mid);
+  }
+  .check-btn {
+    width: 100%; background: var(--ink); color: var(--cream);
+    border: 2px solid var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 700;
+    padding: 13px 24px; cursor: pointer;
+    margin-top: 14px; letter-spacing: 0.03em;
+    transition: all 0.18s;
+    display: flex; align-items: center;
+    justify-content: center; gap: 10px;
+  }
+  .check-btn:hover { background: var(--gold); color: var(--ink); border-color: var(--gold); }
+  .clear-btn {
+    background: none; border: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--mid); padding: 4px 10px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .clear-btn:hover { border-color: var(--mid); color: var(--ink); }
+  .status-bar {
+    padding: 9px 14px; background: var(--parchment);
+    border-top: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    color: var(--mid); letter-spacing: 0.1em;
+    text-transform: uppercase; min-height: 34px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mid); flex-shrink: 0; }
+  .status-dot.done { background: var(--success); }
+  .results-area { min-height: 400px; }
+
+  /* TABS */
+  .tab-nav {
+    display: flex; border-bottom: 2px solid var(--gold);
+    background: var(--ink);
+  }
+  .tab-btn {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 11px 20px; cursor: pointer;
+    border: none; background: none;
+    color: rgba(245,240,232,0.45);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px; transition: all 0.15s;
+  }
+  .tab-btn:hover { color: var(--cream); }
+  .tab-btn.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* SPINNER */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(107,93,79,0.3);
+    border-top-color: var(--mid);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block; vertical-align: middle; margin-right: 6px;
+  }
+
+  .lt-loading {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 300px; gap: 14px; color: var(--mid);
+  }
+  .lt-loading p { font-style: italic; font-size: 14px; }
+
+  .grammar-category { font-size: 12px; color: var(--mid); margin-top: 3px; font-style: italic; }
+  .empty-state {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 340px; gap: 14px;
+    color: var(--mid); text-align: center; padding: 40px 20px;
+  }
+  .empty-icon { font-size: 44px; opacity: 0.35; }
+  .empty-state p { font-style: italic; font-size: 14px; max-width: 240px; line-height: 1.6; opacity: 0.7; }
+  .summary-banner {
+    background: var(--ink); color: var(--cream);
+    padding: 13px 16px; display: flex;
+    align-items: center; gap: 14px;
+    border-bottom: 2px solid var(--gold); flex-wrap: wrap;
+  }
+  .summary-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 14px; }
+  .summary-counts { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+  .count-pill {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    padding: 3px 9px; border-radius: 2px; letter-spacing: 0.05em; font-weight: 500;
+  }
+  .count-pill.error { background: var(--error); color: white; }
+  .count-pill.warning { background: var(--warning); color: white; }
+  .count-pill.info { background: var(--info); color: white; }
+  .issues-list {}
+  .issue-item {
+    border-bottom: 1px solid var(--parchment);
+    padding: 12px 16px;
+    display: grid; grid-template-columns: auto 1fr;
+    gap: 12px; align-items: start;
+  }
+  .issue-item:last-child { border-bottom: none; }
+  .issue-item:hover { background: var(--cream); }
+  .severity-badge {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 3px 7px;
+    border-radius: 2px; white-space: nowrap; margin-top: 1px;
+  }
+  .severity-badge.error { background: #fff0f0; color: var(--error); border: 1px solid #f0c0c0; }
+  .severity-badge.warning { background: #fff8e0; color: var(--warning); border: 1px solid #e8d080; }
+  .severity-badge.info { background: #f0f4ff; color: var(--info); border: 1px solid #c0ccf0; }
+  .issue-text { font-size: 14px; line-height: 1.55; color: var(--ink); margin-bottom: 3px; }
+  .issue-found {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--mid); background: var(--parchment);
+    padding: 3px 8px; border-left: 2px solid var(--gold);
+    margin-top: 5px; display: inline-block;
+    word-break: break-word;
+  }
+  .issue-context {
+    font-size: 12px; color: var(--mid); margin-top: 4px;
+    font-style: italic; line-height: 1.4;
+  }
+  .section-divider {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 16px; background: var(--parchment);
+    border-bottom: 1px solid var(--rule);
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--mid);
+  }
+  .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+  .all-clear {
+    display: flex; flex-direction: column;
+    align-items: center; padding: 50px 20px;
+    gap: 12px; text-align: center;
+  }
+  .all-clear-icon { font-size: 40px; }
+  .all-clear h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--success); }
+  .all-clear p { font-style: italic; color: var(--mid); font-size: 14px; }
+  .filter-bar {
+    display: flex; gap: 6px; padding: 10px 16px;
+    background: var(--parchment); border-bottom: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 10px; border: 1px solid var(--rule);
+    background: white; color: var(--mid);
+    cursor: pointer; border-radius: 2px; transition: all 0.15s;
+  }
+  .filter-btn:hover, .filter-btn.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+  .note-box {
+    background: #f0f4ff; border-left: 3px solid var(--info);
+    padding: 10px 14px; margin-bottom: 14px;
+    font-size: 13px; color: var(--info); line-height: 1.5;
+  }
+  .note-box strong { font-weight: 600; }
+  footer {
+    text-align: center; padding: 18px;
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    color: var(--mid); letter-spacing: 0.1em;
+    border-top: 1px solid var(--rule); margin-top: 10px;
+  }
+  footer span { color: var(--gold); }
+  mark.highlight {
+    background: #ffe680; color: inherit;
+    border-radius: 2px; padding: 0 1px;
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <p class="masthead-eyebrow">Internal Editorial Tool</p>
+  <h1>The House <span>&</span> PoliticsHome</h1>
+  <div class="rule-ornament"><div class="rule-ornament-diamond"></div></div>
+  <p class="masthead-sub">Style Guide Checker</p>
+</header>
+
+<div class="container">
+
+  <!-- LEFT: INPUT -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>📋 Article Input</h2>
+      <span class="panel-header-label">Paste your copy</span>
+    </div>
+    <div class="panel-body">
+      <label class="input-label" for="articleText">Article text</label>
+      <textarea
+        id="articleText"
+        placeholder="Paste your article text here…"
+        oninput="updateMeta()"
+      ></textarea>
+      <div class="meta-row">
+        <p class="char-count" id="charCount">0 words</p>
+        <button class="clear-btn" onclick="clearAll()">Clear</button>
+      </div>
+      <button class="check-btn" onclick="checkArticle()">
+        <span>🔍</span> Check Style Guide &amp; Grammar
+      </button>
+    </div>
+    <div class="status-bar">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Ready — paste article and click Check</span>
+    </div>
+  </div>
+
+  <!-- RIGHT: RESULTS (TABBED) -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Results</h2>
+      <span class="panel-header-label" id="resultsLabel">Awaiting check</span>
+    </div>
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('style')">⚠️ Style Guide</button>
+      <button class="tab-btn" onclick="switchTab('grammar')">📝 Grammar</button>
+    </div>
+
+    <!-- STYLE TAB -->
+    <div id="tab-style" class="tab-pane active">
+      <div id="resultsArea" class="results-area">
+        <div class="empty-state">
+          <div class="empty-icon">📰</div>
+          <p>Paste your article on the left and click Check to scan for style guide violations.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRAMMAR TAB -->
+    <div id="tab-grammar" class="tab-pane">
+      <div id="grammarArea" class="results-area">
+        <div class="empty-state">
+          <div class="empty-icon">✍️</div>
+          <p>Click "Check Against Style Guide" to also run a grammar check via LanguageTool.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>The House & PoliticsHome</span> · Style Guide Checker · For internal editorial use only
+</footer>
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// RULES ENGINE
+// Each rule: { id, category, severity, find, message, note }
+// find: RegExp (with case-insensitive flag where needed)
+// message: string describing the violation + correction
+// note: optional extra context
+// ─────────────────────────────────────────────────────────────
+
+const RULES = [
+
+  // ── SPELLING ──────────────────────────────────────────────
+
+  // Americanisms / UK spelling
+  { id:'s01', category:'Spelling', severity:'ERROR',
+    find: /\borganize\b/gi,
+    message: 'Use UK spelling: "organise" not "organize"' },
+  { id:'s02', category:'Spelling', severity:'ERROR',
+    find: /\borganizing\b/gi,
+    message: 'Use UK spelling: "organising" not "organizing"' },
+  { id:'s03', category:'Spelling', severity:'ERROR',
+    find: /\borganized\b/gi,
+    message: 'Use UK spelling: "organised" not "organized"' },
+  { id:'s04', category:'Spelling', severity:'ERROR',
+    find: /\bmodeling\b/gi,
+    message: 'Use UK spelling: "modelling" not "modeling"' },
+  { id:'s05', category:'Spelling', severity:'ERROR',
+    find: /\bpolarized\b/gi,
+    message: 'Use UK spelling: "polarised" not "polarized"' },
+  { id:'s06', category:'Spelling', severity:'ERROR',
+    find: /\bfantasizing\b/gi,
+    message: 'Use UK spelling: "fantasising" not "fantasizing"' },
+  { id:'s07', category:'Spelling', severity:'ERROR',
+    find: /\bfinalize\b/gi,
+    message: 'Use UK spelling: "finalise" not "finalize"' },
+  { id:'s08', category:'Spelling', severity:'ERROR',
+    find: /\banalyze\b/gi,
+    message: 'Use UK spelling: "analyse" not "analyze"' },
+  { id:'s09', category:'Spelling', severity:'ERROR',
+    find: /\bcriticize\b/gi,
+    message: 'Use UK spelling: "criticise" not "criticize"' },
+  { id:'s10', category:'Spelling', severity:'ERROR',
+    find: /\brecognize\b/gi,
+    message: 'Use UK spelling: "recognise" not "recognize"' },
+  { id:'s11', category:'Spelling', severity:'ERROR',
+    find: /\bfill out a form\b/gi,
+    message: 'Use "fill in a form" not "fill out a form"' },
+  { id:'s12', category:'Spelling', severity:'ERROR',
+    find: /\balright\b/gi,
+    message: 'Use "all right" (two words), not "alright"' },
+  { id:'s13', category:'Spelling', severity:'ERROR',
+    find: /\bamidst\b/gi,
+    message: 'Use "amid" not "amidst"' },
+  { id:'s14', category:'Spelling', severity:'ERROR',
+    find: /\bamongst\b/gi,
+    message: 'Use "among" not "amongst"' },
+  { id:'s15', category:'Spelling', severity:'ERROR',
+    find: /\bwhilst\b/gi,
+    message: 'Use "while" not "whilst"' },
+  { id:'s16', category:'Spelling', severity:'ERROR',
+    find: /\bamock\b|\bamuck\b/gi,
+    message: 'Use "amok" not "amock" or "amuck"' },
+  { id:'s17', category:'Spelling', severity:'ERROR',
+    find: /\bdire straights\b/gi,
+    message: 'Use "dire straits" not "dire straights"' },
+  { id:'s18', category:'Spelling', severity:'ERROR',
+    find: /\bdisassociate\b/gi,
+    message: 'Use "dissociate" not "disassociate"' },
+  { id:'s19', category:'Spelling', severity:'ERROR',
+    find: /\bleaped\b/gi,
+    message: 'Use "leapt" not "leaped"' },
+  { id:'s20', category:'Spelling', severity:'WARNING',
+    find: /\bearnt\b/gi,
+    message: 'Use "earned" not "earnt"' },
+  { id:'s21', category:'Spelling', severity:'ERROR',
+    find: /\bnerve-wracking\b|\bnervewracking\b|\bnerve wracking\b/gi,
+    message: 'Use "nerve-racking" not "nerve-wracking"' },
+  { id:'s22', category:'Spelling', severity:'ERROR',
+    find: /\bchomp at the bit\b/gi,
+    message: 'Use "champ at the bit" not "chomp at the bit"' },
+  { id:'s23', category:'Spelling', severity:'ERROR',
+    find: /\bhere, here\b/gi,
+    message: 'Use "hear, hear" not "here, here"' },
+  { id:'s24', category:'Spelling', severity:'ERROR',
+    find: /\brooves\b/gi,
+    message: 'Use "roofs" not "rooves"' },
+  { id:'s25', category:'Spelling', severity:'ERROR',
+    find: /\bimpostor\b/gi,
+    message: '"Imposter" should be "impostor"',
+    note: 'Check: is it spelled "imposter"?' },
+  { id:'s26', category:'Spelling', severity:'ERROR',
+    find: /\bimposter\b/gi,
+    message: 'Use "impostor" not "imposter"' },
+  { id:'s27', category:'Spelling', severity:'ERROR',
+    find: /\bfillibuster\b/gi,
+    message: 'Use "filibuster" not "fillibuster"' },
+  { id:'s28', category:'Spelling', severity:'ERROR',
+    find: /\bno-one\b/gi,
+    message: 'Use "no one" (two words, no hyphen), not "no-one"' },
+  { id:'s29', category:'Spelling', severity:'ERROR',
+    find: /\banymore\b/gi,
+    message: 'Use "any more" (two words) not "anymore"' },
+  { id:'s30', category:'Spelling', severity:'WARNING',
+    find: /\baging\b/gi,
+    message: 'Use "ageing" not "aging" (UK spelling)' },
+  { id:'s31', category:'Spelling', severity:'ERROR',
+    find: /\badvisor\b/gi,
+    message: 'Use "adviser" not "advisor"' },
+  { id:'s32', category:'Spelling', severity:'ERROR',
+    find: /\banti-semitic\b|\bAnti-Semitic\b|\bAntiSemitic\b/gi,
+    message: 'Use "antisemitic" (one word, lowercase s)' },
+  { id:'s33', category:'Spelling', severity:'ERROR',
+    find: /\banti-semitism\b|\bAnti-Semitism\b/gi,
+    message: 'Use "antisemitism" (one word, lowercase s)' },
+  { id:'s34', category:'Spelling', severity:'ERROR',
+    find: /\bZelensky\b/g,
+    message: 'Check spelling: should be "Zelensky" — confirm this is correct',
+    note: 'Style guide specifies: Zelensky, Volodymyr' },
+  { id:'s35', category:'Spelling', severity:'WARNING',
+    find: /\bZelenskyy\b/g,
+    message: 'Style guide spells this as "Zelensky" (one y)' },
+  { id:'s36', category:'Spelling', severity:'ERROR',
+    find: /\bGandhi\b/g,
+    message: 'Check spelling: the style guide specifies "Gandhi"' },
+  { id:'s37', category:'Spelling', severity:'ERROR',
+    find: /\bGandhi/g,
+    message: 'Check spelling: should be "Gandhi"' },
+  { id:'s38', category:'Spelling', severity:'ERROR',
+    find: /\bPoliticsHome\b/g,
+    message: '"PoliticsHome" — confirm this capitalisation is correct per brand guidelines' },
+  { id:'s39', category:'Spelling', severity:'WARNING',
+    find: /\b(programme|program)\b/gi,
+    message: 'Use "programme" for general use; "program" only for computer software' },
+
+  // ── WORD CHOICE ────────────────────────────────────────────
+
+  { id:'w01', category:'Word Choice', severity:'WARNING',
+    find: /\bapproximately\b/gi,
+    message: 'Prefer "about" over "approximately"' },
+  { id:'w02', category:'Word Choice', severity:'ERROR',
+    find: /\bimpact on\b/gi,
+    message: 'Avoid "impact on" as a synonym for "affect" — use "affect" or "have an effect on"' },
+  { id:'w03', category:'Word Choice', severity:'WARNING',
+    find: /\bcould potentially impact\b|\bmight impact\b|\bwill impact\b/gi,
+    message: 'Avoid using "impact" as a verb — use "affect" instead' },
+  { id:'w04', category:'Word Choice', severity:'ERROR',
+    find: /\bfirstly\b/gi,
+    message: 'Use "first" not "firstly"; then "secondly, thirdly" etc.' },
+  { id:'w05', category:'Word Choice', severity:'ERROR',
+    find: /\bDAESH\b|\bDaesh\b/g,
+    message: 'Use "Islamic State" not "Daesh"' },
+  { id:'w06', category:'Word Choice', severity:'ERROR',
+    find: /\bWorld War One\b|\bWorld War 1\b|\bWWI\b/g,
+    message: 'Use "First World War" not "World War One" or "WWI"' },
+  { id:'w07', category:'Word Choice', severity:'ERROR',
+    find: /\bWorld War Two\b|\bWorld War 2\b|\bWWII\b/g,
+    message: 'Use "Second World War" not "World War Two" or "WWII"' },
+  { id:'w08', category:'Word Choice', severity:'ERROR',
+    find: /\bXmas\b/g,
+    message: 'Use "Christmas" not "Xmas" (unless quoting Slade)' },
+  { id:'w09', category:'Word Choice', severity:'WARNING',
+    find: /\bBAME\b/g,
+    message: 'Avoid "BAME" — use "Black, Asian and minority ethnic" at first mention' },
+  { id:'w10', category:'Word Choice', severity:'WARNING',
+    find: /\bnon-white\b/gi,
+    message: 'Avoid "non-white" — preferred umbrella term is "ethnic minorities"' },
+  { id:'w11', category:'Word Choice', severity:'WARNING',
+    find: /\bpeople of colour\b/gi,
+    message: 'Avoid "people of colour" unless in direct quotes — preferred term is "ethnic minorities"' },
+  { id:'w12', category:'Word Choice', severity:'INFO',
+    find: /\bfisherman\b|\bfishermen\b/gi,
+    message: 'Consider using "fisher" or "fishers" instead of "fisherman/fishermen" (but "fisherman\'s jumper" is fine)' },
+  { id:'w13', category:'Word Choice', severity:'WARNING',
+    find: /\bcrippled\b/gi,
+    message: 'Avoid "crippled" — use alternatives like "ravaged" or "on the brink of collapse"' },
+  { id:'w14', category:'Word Choice', severity:'ERROR',
+    find: /\bvs\b\.?/g,
+    message: 'Use "v" not "vs" for versus' },
+  { id:'w15', category:'Word Choice', severity:'INFO',
+    find: /\bGenuinely\b|\bgenuinely\b/g,
+    message: 'Style note: avoid "genuinely" — find a more precise word' },
+  { id:'w16', category:'Word Choice', severity:'INFO',
+    find: /\bhonestly\b/gi,
+    message: 'Style note: avoid "honestly" — find a more precise word' },
+
+  // ── PUNCTUATION ────────────────────────────────────────────
+
+  { id:'p01', category:'Punctuation', severity:'ERROR',
+    find: /\b(\w+)s's\b/g,
+    message: 'Apostrophe style: use s\' not s\'s (e.g. Boris\' not Boris\'s, boss\' not boss\'s)' },
+  { id:'p02', category:'Punctuation', severity:'ERROR',
+    find: /Boris's|Truss's|boss's/g,
+    message: 'Apostrophe style: use s\' not s\'s (e.g. Boris\' not Boris\'s)' },
+  { id:'p03', category:'Punctuation', severity:'ERROR',
+    find: /\d+:\d{2}[ap]m\b/gi,
+    message: 'Time format: use 10.30pm not 10:30pm (full stop, not colon)' },
+  { id:'p04', category:'Punctuation', severity:'ERROR',
+    find: /[0-9]{2}:[0-9]{2}\b(?![ap]m)/gi,
+    message: 'Time format: use 10.30pm style, not 24-hour (22:30)' },
+  { id:'p05', category:'Punctuation', severity:'ERROR',
+    find: /\d+ (January|February|March|April|May|June|July|August|September|October|November|December),\s+\d{4}/gi,
+    message: 'No comma between month and year: "1 March 2021" not "1 March, 2021"' },
+  { id:'p06', category:'Punctuation', severity:'ERROR',
+    find: /\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/g,
+    message: 'Write dates in full: "1 March 2021" not numeric format. Use "to" in date ranges, not slashes.' },
+  { id:'p07', category:'Punctuation', severity:'ERROR',
+    find: /\be\.g\./gi,
+    message: 'Use "eg" not "e.g." (no full stops)' },
+  { id:'p08', category:'Punctuation', severity:'ERROR',
+    find: /\bi\.e\./gi,
+    message: 'Use "ie" not "i.e." (no full stops)' },
+  { id:'p09', category:'Punctuation', severity:'INFO',
+    find: /—/g,
+    message: 'Use en dash (–) not em dash (—). In most keyboards: option+hyphen (Mac) or alt+0150 (Windows)' },
+  { id:'p09b', category:'Punctuation', severity:'ERROR',
+    find: / - /g,
+    message: 'Use an en dash (–) not a hyphen (-) to connect clauses. A hyphen with spaces around it should be an en dash — e.g. "He left early – and never returned"' },
+  { id:'p10', category:'Punctuation', severity:'ERROR',
+    find: /\bSt\.\s/g,
+    message: 'Saints: use "St" without full stop (St Martin\'s, not St. Martin\'s)' },
+  { id:'p11', category:'Punctuation', severity:'ERROR',
+    find: /\b'(\d{2})\b/g,
+    message: 'Don\'t use apostrophe when abbreviating a year: "97" not "\'97"' },
+  { id:'p13', category:'Punctuation', severity:'WARNING',
+    find: /(?<!\b(?:Mr|Mrs|Ms|Dr|Prof|St|Ave|Rd|Jr|Sr|vs|eg|ie|etc|Rev|Hon|Gen|Sgt|Cpl|Col|Ltd|plc|approx|dept|fig|govt|max|min|no|vol|tel))\.\s+[a-z]/g,
+    message: 'Possible missing capital letter after a full stop — check if this is the start of a new sentence' },
+  { id:'p12', category:'Punctuation', severity:'INFO',
+    find: /\.\.\.(?!\s)/g,
+    message: 'Ellipsis should have a space after it: "word... next"' },
+
+  // ── NUMBERS & PERCENTAGES ──────────────────────────────────
+
+  { id:'n01', category:'Numbers', severity:'ERROR',
+    find: /\d+%/g,
+    message: 'Write out percentage as "per cent" (two words), not %, in body text' },
+  { id:'n02', category:'Numbers', severity:'ERROR',
+    find: /\bpercent\b/gi,
+    message: 'Use "per cent" (two words), not "percent"' },
+  { id:'n03', category:'Numbers', severity:'WARNING',
+    find: /\bone\s+billion\b|\btwo\s+billion\b|\bthree\s+billion\b|\bfour\s+billion\b|\bfive\s+billion\b|\bsix\s+billion\b|\bseven\s+billion\b|\beight\s+billion\b|\bnine\s+billion\b/gi,
+    message: 'For sums of money, use "bn" not "billion" (£5bn). But spell out for people/animals (one billion people).' },
+  { id:'n04', category:'Numbers', severity:'WARNING',
+    find: /\bone\s+million\b|\btwo\s+million\b|\bthree\s+million\b/gi,
+    message: 'For sums of money, use "m" not "million" (£5m). But spell out for people/animals (one million people).' },
+  { id:'n05', category:'Numbers', severity:'WARNING',
+    find: /\b(10|11|12|13|14|15|16|17|18|19|[2-9][0-9])\s+(thousand|hundred)\b/gi,
+    message: 'Use figures for numbers 10 and above' },
+  { id:'n06', category:'Numbers', severity:'ERROR',
+    find: /the (\d{4})s'/g,
+    message: 'Decades: use "the 1960s" not "the 1960s\'" (no apostrophe before s)' },
+
+  // ── CAPITALISATION ─────────────────────────────────────────
+
+  { id:'c01', category:'Capitalisation', severity:'WARNING',
+    find: /\bthe prime minister\b(?!'s)/g,
+    message: 'Check: "Prime Minister" should be upper case when referring to the current incumbent' },
+  { id:'c02', category:'Capitalisation', severity:'WARNING',
+    find: /\bchancellor\b/g,
+    message: 'Check: "Chancellor" should be upper case when referring to the current officeholder in Cabinet context' },
+  { id:'c03', category:'Capitalisation', severity:'ERROR',
+    find: /\bfirst world war\b|\bsecond world war\b/gi,
+    message: 'Use "First World War" and "Second World War" (upper case)' },
+  { id:'c04', category:'Capitalisation', severity:'ERROR',
+    find: /\bholocaust\b/g,
+    message: 'Use "Holocaust" (upper case H)' },
+  { id:'c05', category:'Capitalisation', severity:'ERROR',
+    find: /\bcold war\b/g,
+    message: 'Use "Cold War" (upper case)' },
+  { id:'c06', category:'Capitalisation', severity:'ERROR',
+    find: /\bgood friday agreement\b/gi,
+    message: 'Use "Good Friday Agreement" (upper case)' },
+  { id:'c07', category:'Capitalisation', severity:'ERROR',
+    find: /\bgeneral strike\b/gi,
+    message: 'Use "General Strike" (upper case) when referring to the 1926 strike' },
+  { id:'c08', category:'Capitalisation', severity:'WARNING',
+    find: /\bblack\b/g,
+    message: 'Check: "Black" (referring to race/ethnicity) should have an upper-case B' },
+  { id:'c09', category:'Capitalisation', severity:'ERROR',
+    find: /\bpartygate\b/gi,
+    message: 'Use "Partygate" (upper case P)' },
+  { id:'c10', category:'Capitalisation', severity:'ERROR',
+    find: /\bspecial relationship\b/gi,
+    message: 'Use "Special Relationship" (upper case)' },
+  { id:'c11', category:'Capitalisation', severity:'ERROR',
+    find: /\bbrexiteer\b/gi,
+    message: 'Use "Brexiteer" (upper case B)' },
+  { id:'c12', category:'Capitalisation', severity:'WARNING',
+    find: /\bcabinet\b/g,
+    message: 'Check: "Cabinet" should be upper case when referring to the current Cabinet' },
+  { id:'c13', category:'Capitalisation', severity:'ERROR',
+    find: /\bpremier league\b/gi,
+    message: 'Use "Premier League" (upper case)' },
+  { id:'c14', category:'Capitalisation', severity:'ERROR',
+    find: /\bnational insurance\b/gi,
+    message: 'Use "National Insurance" (upper case)' },
+  { id:'c15', category:'Capitalisation', severity:'ERROR',
+    find: /\buniversal credit\b/gi,
+    message: 'Use "Universal Credit" (upper case — official benefit name)' },
+  { id:'c16', category:'Capitalisation', severity:'ERROR',
+    find: /coronavirus/gi,
+    message: 'Use "coronavirus" with a lowercase c' },
+  { id:'c17', category:'Capitalisation', severity:'WARNING',
+    find: /\bthe tube\b/gi,
+    message: 'Use "the Tube" (upper case T) for the London Underground' },
+  { id:'c18', category:'Capitalisation', severity:'ERROR',
+    find: /covid-19|Covid19|COVID-19|COVID19/g,
+    message: 'Use "Covid-19" (capital C, lowercase ovid)' },
+  { id:'c19', category:'Capitalisation', severity:'ERROR',
+    find: /\blong covid\b/gi,
+    message: 'Use "long Covid" (capital C)' },
+  { id:'c21', category:'Capitalisation', severity:'WARNING',
+    find: /\bthis [Pp]arliament\b|\bthe next [Pp]arliament\b|\ba previous [Pp]arliament\b|\bprevious [Pp]arliament\b|\bnext [Pp]arliament\b|\bthe [Pp]arliament\b(?! building|\s+of\s+(?!the\b))/g,
+    message: 'Check: "parliament" should be lowercase when referring to a session (e.g. "this parliament", "the next parliament") — only uppercase for the building or institution' },
+
+  { id:'c22', category:'Capitalisation', severity:'WARNING',
+    find: /\bthe prime minister\b/gi,
+    message: 'Check capitalisation: "Prime Minister" is upper case when referring to the current incumbent; lower case when speaking generally' },
+  { id:'c23', category:'Capitalisation', severity:'WARNING',
+    find: /\bthe chancellor\b/gi,
+    message: 'Check capitalisation: "Chancellor" is upper case when referring to the current incumbent' },
+  { id:'c24', category:'Capitalisation', severity:'WARNING',
+    find: /\bthe home secretary\b/gi,
+    message: 'Check capitalisation: "Home Secretary" is upper case when referring to the current incumbent' },
+  { id:'c25', category:'Capitalisation', severity:'WARNING',
+    find: /\bthe speaker\b/gi,
+    message: 'Check capitalisation: "the Speaker" (Commons) is upper case' },
+  { id:'c26', category:'Capitalisation', severity:'WARNING',
+    find: /\battorney general\b/gi,
+    message: 'Check capitalisation: "Attorney General" is upper case when referring to the current incumbent' },
+  { id:'c27', category:'Capitalisation', severity:'WARNING',
+    find: /\bchief secretary to the treasury\b/gi,
+    message: 'Check capitalisation: "Chief Secretary to the Treasury" is upper case when referring to the current incumbent' },
+  { id:'c28', category:'Capitalisation', severity:'WARNING',
+    find: /\bchief whip\b/gi,
+    message: 'Check capitalisation: "Chief Whip" is upper case when referring to the current incumbent' },
+  { id:'c29', category:'Capitalisation', severity:'WARNING',
+    find: /\bsolicitor general\b/gi,
+    message: 'Check capitalisation: "Solicitor General" is upper case when referring to the current incumbent' },
+  { id:'c30', category:'Capitalisation', severity:'WARNING',
+    find: /\bgovernor of the bank of england\b/gi,
+    message: 'Keep "governor of the Bank of England" lowercase — this is not a Cabinet title' },
+  { id:'c31', category:'Capitalisation', severity:'ERROR',
+    find: /\bBank of England\b/g,
+    message: 'Check: "Bank of England" should be upper case — but "governor of the Bank of England" stays lowercase' },
+  { id:'c32', category:'Capitalisation', severity:'WARNING',
+    find: /\bthe pope\b/gi,
+    message: 'Correct form is "the pope" (lowercase) — but "Pope Francis" is upper case when used as a title before the name' },
+  { id:'c33', category:'Capitalisation', severity:'WARNING',
+    find: /\bpresident (?!of the)/gi,
+    message: 'Check capitalisation: use "President Biden" (upper case when used as title before name); but "the US president, Joe Biden" (lower case when after "the")' },
+  { id:'c34', category:'Capitalisation', severity:'WARNING',
+    find: /\bthe (?:duke|duchess|earl|lord|baron|baroness) of\b/gi,
+    message: 'Check capitalisation: "the Duke of X" on first mention is upper case; but "the duke" on subsequent mentions is lower case' },
+  { id:'c20', category:'Capitalisation', severity:'WARNING',
+    find: /\binternet\b/gi,
+    message: 'Check: "internet" is now standard lowercase' },
+
+  // ── HYPHENATION ────────────────────────────────────────────
+
+  { id:'h01', category:'Hyphenation', severity:'ERROR',
+    find: /\bcyber security\b|\bcybersecure\b/gi,
+    message: 'Use "cybersecurity" (one word)' },
+  { id:'h02', category:'Hyphenation', severity:'ERROR',
+    find: /\bcyber crime\b/gi,
+    message: 'Use "cybercrime" (one word)' },
+  { id:'h03', category:'Hyphenation', severity:'ERROR',
+    find: /\bcyber space\b/gi,
+    message: 'Use "cyberspace" (one word)' },
+  { id:'h04', category:'Hyphenation', severity:'ERROR',
+    find: /\bcyber terrorism\b/gi,
+    message: 'Use "cyberterrorism" (one word)' },
+  { id:'h05', category:'Hyphenation', severity:'ERROR',
+    find: /\bcyber war\b/gi,
+    message: 'Use "cyberwar" (one word)' },
+  { id:'h06', category:'Hyphenation', severity:'ERROR',
+    find: /\bback bench\b|\bback-bench\b/gi,
+    message: 'Use "backbench" (one word) as adjective; "backbencher/backbenches" (one word)' },
+  { id:'h07', category:'Hyphenation', severity:'ERROR',
+    find: /\bfront bench\b/gi,
+    message: 'Use "frontbench" (one word); "frontbencher" (one word)' },
+  { id:'h08', category:'Hyphenation', severity:'ERROR',
+    find: /\bpolicy maker\b|\bpolicy-maker\b/gi,
+    message: 'Use "policymaker" (one word)' },
+  { id:'h09', category:'Hyphenation', severity:'ERROR',
+    find: /\bpolicy making\b|\bpolicy-making\b/gi,
+    message: 'Use "policymaking" (one word)' },
+  { id:'h10', category:'Hyphenation', severity:'ERROR',
+    find: /\bgame changer\b|\bgame-changer\b/gi,
+    message: 'Use "gamechanger" (one word)' },
+  { id:'h11', category:'Hyphenation', severity:'ERROR',
+    find: /\broad map\b|\broad-map\b/gi,
+    message: 'Use "roadmap" (one word)' },
+  { id:'h12', category:'Hyphenation', severity:'ERROR',
+    find: /\btask force\b|\btask-force\b/gi,
+    message: 'Use "taskforce" (one word)' },
+  { id:'h13', category:'Hyphenation', severity:'ERROR',
+    find: /\bstart up\b|\bstart-up\b/gi,
+    message: 'Use "startup" (one word)' },
+  { id:'h14', category:'Hyphenation', severity:'ERROR',
+    find: /\bground breaking\b|\bground-breaking\b/gi,
+    message: 'Use "groundbreaking" (one word)' },
+  { id:'h15', category:'Hyphenation', severity:'ERROR',
+    find: /\bhome grown\b|\bhome-grown\b/gi,
+    message: 'Use "homegrown" (one word)' },
+  { id:'h16', category:'Hyphenation', severity:'ERROR',
+    find: /\bhouse building\b|\bhouse-building\b/gi,
+    message: 'Use "housebuilding" (one word)' },
+  { id:'h17', category:'Hyphenation', severity:'ERROR',
+    find: /\bhealth care\b|\bhealth-care\b/gi,
+    message: 'Use "healthcare" (one word)' },
+  { id:'h18', category:'Hyphenation', severity:'ERROR',
+    find: /\bwell being\b|\bwell-being\b/gi,
+    message: 'Use "wellbeing" (one word)' },
+  { id:'h19', category:'Hyphenation', severity:'ERROR',
+    find: /\broll-out\b|\brollout\b/gi,
+    message: '"Roll out" as verb (two words); "rollout" as noun (one word)' },
+  { id:'h20', category:'Hyphenation', severity:'ERROR',
+    find: /\bpost mortem\b|\bpost-mortem\b/gi,
+    message: 'Use "postmortem" (one word)' },
+  { id:'h21', category:'Hyphenation', severity:'ERROR',
+    find: /\bpost war\b|\bpost-war\b/gi,
+    message: 'Use "postwar" (one word)' },
+  { id:'h22', category:'Hyphenation', severity:'ERROR',
+    find: /\bshort list\b|\bshort-list\b/gi,
+    message: 'Use "shortlist" (one word)' },
+  { id:'h23', category:'Hyphenation', severity:'ERROR',
+    find: /\bdata set\b|\bdata-set\b/gi,
+    message: 'Use "dataset" (one word)' },
+  { id:'h24', category:'Hyphenation', severity:'ERROR',
+    find: /\bmulti storey\b|\bmulti-storey\b/gi,
+    message: 'Use "multistorey" (one word)' },
+  { id:'h25', category:'Hyphenation', severity:'ERROR',
+    find: /\bschool children\b/gi,
+    message: 'Use "schoolchildren" (one word)' },
+  { id:'h26', category:'Hyphenation', severity:'ERROR',
+    find: /\be-book\b/gi,
+    message: 'Use "ebook" (one word, no hyphen)' },
+  { id:'h27', category:'Hyphenation', severity:'ERROR',
+    find: /\bWi-Fi\b|\bWiFi\b|\bwifi\b/g,
+    message: 'Use "wi-fi" (lowercase, hyphenated)' },
+  { id:'h28', category:'Hyphenation', severity:'ERROR',
+    find: /\bco operate\b|\bcooperate\b/gi,
+    message: 'Use "co-operate" (with hyphen)' },
+  { id:'h29', category:'Hyphenation', severity:'ERROR',
+    find: /\bcoordinate\b/gi,
+    message: 'Use "co-ordinate" (with hyphen)' },
+  { id:'h30', category:'Hyphenation', severity:'ERROR',
+    find: /\bcross party\b/gi,
+    message: 'Use "cross-party" (with hyphen)' },
+  { id:'h31', category:'Hyphenation', severity:'ERROR',
+    find: /\bright wing\b(?!\s*party|\s*government)/gi,
+    message: 'Use "right-wing" (hyphenated when adjective)' },
+  { id:'h32', category:'Hyphenation', severity:'ERROR',
+    find: /\bleft wing\b/gi,
+    message: 'Use "left-wing" (hyphenated when adjective)' },
+  { id:'h33', category:'Hyphenation', severity:'ERROR',
+    find: /\bnet zero\b/gi,
+    message: 'Use "net-zero" (hyphenated)' },
+  { id:'h34', category:'Hyphenation', severity:'ERROR',
+    find: /\bzero hours contract\b/gi,
+    message: 'Use "zero-hours contract" (hyphenated)' },
+  { id:'h35', category:'Hyphenation', severity:'ERROR',
+    find: /\bt shirt\b|\btee-shirt\b|\btee shirt\b/gi,
+    message: 'Use "T-shirt" (hyphenated, capital T)' },
+  { id:'h36', category:'Hyphenation', severity:'ERROR',
+    find: /\bx ray\b/gi,
+    message: 'Use "X-ray" (hyphenated, capital X)' },
+  { id:'h37', category:'Hyphenation', severity:'ERROR',
+    find: /\bu turn\b/gi,
+    message: 'Use "U-turn" (hyphenated, capital U)' },
+  { id:'h38', category:'Hyphenation', severity:'ERROR',
+    find: /\bfirst hand\b/gi,
+    message: 'Use "first-hand" (hyphenated)' },
+  { id:'h39', category:'Hyphenation', severity:'ERROR',
+    find: /\bhigh tech\b/gi,
+    message: 'Use "hi-tech" (with hyphen, and "hi" not "high")' },
+  { id:'h40', category:'Hyphenation', severity:'ERROR',
+    find: /\bhigh vis\b/gi,
+    message: 'Use "hi-vis" (with hyphen, and "hi" not "high")' },
+  { id:'h41', category:'Hyphenation', severity:'ERROR',
+    find: /\bmulti-disciplinary\b|\bmultidisciplinary\b/gi,
+    message: 'Use "multidisciplinary" (one word)' },
+  { id:'h42', category:'Hyphenation', severity:'ERROR',
+    find: /\bhead teacher\b|\bhead-teacher\b/gi,
+    message: 'Use "headteacher" (one word)' },
+  { id:'h43', category:'Hyphenation', severity:'ERROR',
+    find: /\bshop worker\b|\bshop-worker\b/gi,
+    message: 'Use "shopworker" (one word)' },
+  { id:'h44', category:'Hyphenation', severity:'ERROR',
+    find: /\blong term\b(?!\s+\w)/gi,
+    message: 'Check: "long-term" takes a hyphen when used as a compound adjective (e.g. "a long-term plan")' },
+  { id:'h45', category:'Hyphenation', severity:'ERROR',
+    find: /\bcounter terrorism\b/gi,
+    message: 'Use "counter-terrorism" (hyphenated)' },
+  { id:'h46', category:'Hyphenation', severity:'ERROR',
+    find: /\banti apartheid\b/gi,
+    message: 'Use "anti-apartheid" (hyphenated)' },
+
+  // ── ACRONYMS ───────────────────────────────────────────────
+
+  { id:'a01', category:'Acronyms', severity:'ERROR',
+    find: /\bNATO\b/g,
+    message: 'Use "Nato" (not NATO) — pronounced as a word, so only initial cap' },
+  { id:'a02', category:'Acronyms', severity:'ERROR',
+    find: /\bUNESCO\b/g,
+    message: 'Use "Unesco" (not UNESCO)' },
+  { id:'a03', category:'Acronyms', severity:'ERROR',
+    find: /\bUNICEF\b/g,
+    message: 'Use "Unicef" (not UNICEF)' },
+  { id:'a04', category:'Acronyms', severity:'ERROR',
+    find: /\bUEFA\b/g,
+    message: 'Use "Uefa" (not UEFA)' },
+  { id:'a05', category:'Acronyms', severity:'ERROR',
+    find: /\bFIFA\b/g,
+    message: 'Use "Fifa" (not FIFA)' },
+  { id:'a06', category:'Acronyms', severity:'ERROR',
+    find: /\bINTERPOL\b/g,
+    message: 'Use "Interpol" (not INTERPOL)' },
+  { id:'a07', category:'Acronyms', severity:'ERROR',
+    find: /\bOFSTED\b/g,
+    message: 'Use "Ofsted" (not OFSTED)' },
+  { id:'a08', category:'Acronyms', severity:'ERROR',
+    find: /\bAcAS\b|\bACAS\b/g,
+    message: 'Use "Acas" (not ACAS)' },
+  { id:'a09', category:'Acronyms', severity:'ERROR',
+    find: /\bDEFRA\b/g,
+    message: 'Use "Defra" (not DEFRA)' },
+  { id:'a10', category:'Acronyms', severity:'ERROR',
+    find: /\bFoI\b/g,
+    message: 'Use "FOI" not "FoI" for Freedom of Information' },
+  { id:'a11', category:'Acronyms', severity:'WARNING',
+    find: /\bPIN number\b/gi,
+    message: 'Use "Pin number" or "pin number" (not "PIN number" — the N in PIN already stands for "number")' },
+  { id:'a12', category:'Acronyms', severity:'ERROR',
+    find: /\bokay\b|\bO\.K\.\b/gi,
+    message: 'Use "OK" not "okay" or "O.K."' },
+
+  // ── STYLE ──────────────────────────────────────────────────
+
+  { id:'st01', category:'Style', severity:'WARNING',
+    find: /\bAfrican American\b/g,
+    message: 'Use "African-American" (hyphenated)' },
+  { id:'st02', category:'Style', severity:'WARNING',
+    find: /\bal-Qaeda\b|\bal Qaeda\b|\bAl Qaeda\b|\bAl-Qaeda\b/g,
+    message: 'Use "al-Qaeda" (lowercase al, hyphen)' },
+  { id:'st03', category:'Style', severity:'ERROR',
+    find: /Israel Defence Forces|Israeli Defence Forces/g,
+    message: 'Use "Israel Defense Forces" (American spelling of Defense, per style guide)' },
+  { id:'st04', category:'Style', severity:'INFO',
+    find: /\bsaid on X\b|\bposted on X\b|\bwrote on X\b/gi,
+    message: 'Style guide says "said on Twitter" / "tweeted" — confirm whether to update for X/Twitter rebrand' },
+  { id:'st05', category:'Style', severity:'ERROR',
+    find: /\bA-star\b|\bA star\b/gi,
+    message: 'Use "A*" not "A-star" for the exam grade' },
+  { id:'st06', category:'Style', severity:'WARNING',
+    find: /\bGov\.uk\b|\bgov\.uk\b/gi,
+    message: 'Check: is this referencing the GOV.UK website? Use correct capitalisation.' },
+
+  // ── MISSING SPELLING & WORD FORM RULES ───────────────────
+
+  { id:'m01', category:'Spelling', severity:'ERROR',
+    find: /\bfulfill\b/gi,
+    message: 'Use "fulfil" not "fulfill" (UK spelling)' },
+  { id:'m02', category:'Spelling', severity:'ERROR',
+    find: /\bfulfillment\b/gi,
+    message: 'Use "fulfilment" not "fulfillment" (UK spelling)' },
+  { id:'m03', category:'Spelling', severity:'ERROR',
+    find: /\bhayfever\b/gi,
+    message: 'Use "hay fever" (two words)' },
+  { id:'m04', category:'Spelling', severity:'ERROR',
+    find: /\bprotestor\b/gi,
+    message: 'Use "protester" not "protestor"' },
+  { id:'m05', category:'Spelling', severity:'ERROR',
+    find: /\bunderway\b|\bunder-way\b/gi,
+    message: 'Use "under way" (two words, no hyphen)' },
+  { id:'m06', category:'Spelling', severity:'ERROR',
+    find: /\bvocal chords\b/gi,
+    message: 'Use "vocal cords" not "vocal chords"' },
+  { id:'m07', category:'Spelling', severity:'ERROR',
+    find: /\bmoney.grabbing\b/gi,
+    message: 'Use "money grubbing" not "money grabbing"' },
+  { id:'m08', category:'Spelling', severity:'ERROR',
+    find: /\bthe Yemen\b/gi,
+    message: 'Use "Yemen" not "the Yemen"' },
+  { id:'m09', category:'Spelling', severity:'ERROR',
+    find: /\byoghurt\b/gi,
+    message: 'Use "yogurt" not "yoghurt" (per style guide)' },
+  { id:'m10', category:'Spelling', severity:'ERROR',
+    find: /\bCaesarean\b/g,
+    message: 'Use "caesarean section" (lowercase c)' },
+  { id:'m11', category:'Spelling', severity:'ERROR',
+    find: /\bcaesarian\b/gi,
+    message: 'Use "caesarean" not "caesarian"' },
+
+  // ── MISSING HYPHENATION RULES ─────────────────────────────
+
+  { id:'m12', category:'Hyphenation', severity:'ERROR',
+    find: /\bdecision-making\b/gi,
+    message: 'Use "decision making" (no hyphen)' },
+  { id:'m13', category:'Hyphenation', severity:'ERROR',
+    find: /\bby election\b|\bbyelection\b/gi,
+    message: 'Use "by-election" (hyphenated)' },
+  { id:'m14', category:'Hyphenation', severity:'ERROR',
+    find: /\bnight time\b|\bnighttime\b/gi,
+    message: 'Use "night-time" (hyphenated)' },
+  { id:'m15', category:'Hyphenation', severity:'ERROR',
+    find: /\bsecond hand\b/gi,
+    message: 'Use "secondhand" (one word)' },
+  { id:'m16', category:'Hyphenation', severity:'ERROR',
+    find: /\brom-com\b|\bromantic comedy\b/gi,
+    message: 'Use "romcom" (one word, no hyphen)' },
+  { id:'m17', category:'Hyphenation', severity:'ERROR',
+    find: /\btrans-atlantic\b/gi,
+    message: 'Use "transatlantic" (one word)' },
+  { id:'m18', category:'Hyphenation', severity:'ERROR',
+    find: /\bsocio-economic\b/gi,
+    message: 'Use "socioeconomic" (one word)' },
+  { id:'m19', category:'Hyphenation', severity:'INFO',
+    find: /\bfront line\b/gi,
+    message: 'Check: "front line" (noun, two words) vs "front-line" (adjective, hyphenated) — eg "sent to the front line" but "a front-line position"' },
+  { id:'m20', category:'Hyphenation', severity:'ERROR',
+    find: /\bcost-of-living crisis\b/gi,
+    message: 'Use "cost of living crisis" (no hyphens)' },
+  { id:'m21', category:'Hyphenation', severity:'ERROR',
+    find: /\banti-social\b/gi,
+    message: 'Use "antisocial" (one word, no hyphen)' },
+  { id:'m22', category:'Hyphenation', severity:'ERROR',
+    find: /\banti-virus\b/gi,
+    message: 'Use "antivirus" (one word, no hyphen)' },
+  { id:'m23', category:'Hyphenation', severity:'ERROR',
+    find: /\bcease.fire\b/gi,
+    message: 'Use "ceasefire" (one word)' },
+  { id:'m24', category:'Hyphenation', severity:'ERROR',
+    find: /\bmulti-lateral\b/gi,
+    message: 'Use "multilateral" (one word)' },
+  { id:'m25', category:'Hyphenation', severity:'ERROR',
+    find: /\bmulti-lingual\b/gi,
+    message: 'Use "multilingual" (one word)' },
+  { id:'m26', category:'Hyphenation', severity:'ERROR',
+    find: /\bmulti-media\b/gi,
+    message: 'Use "multimedia" (one word)' },
+
+  // ── MISSING CAPITALISATION RULES ──────────────────────────
+
+  { id:'m27', category:'Capitalisation', severity:'ERROR',
+    find: /\bglobal south\b/gi,
+    message: 'Use "Global South" (upper case)' },
+  { id:'m28', category:'Capitalisation', severity:'WARNING',
+    find: /\bprivate member's bill\b|\bprivate members bill\b/gi,
+    message: 'Use "Private Members\' Bill" (upper case, with apostrophe after Members)' },
+  { id:'m29', category:'Capitalisation', severity:'ERROR',
+    find: /\bType [12] [Dd]iabetes\b|\bType [12] diabetes\b/g,
+    message: 'Use "type 1" / "type 2" diabetes (lowercase t)' },
+  { id:'m30', category:'Capitalisation', severity:'WARNING',
+    find: /\bGeneration [XYZ]\b/g,
+    message: 'Use "gen X", "gen Y", "gen Z" (not "Generation X" etc)' },
+  { id:'m31', category:'Capitalisation', severity:'ERROR',
+    find: /\ba-level\b/gi,
+    message: 'Use "A-level" (upper case A, lower case l)' },
+  { id:'m32', category:'Capitalisation', severity:'ERROR',
+    find: /\bo-level\b/gi,
+    message: 'Use "O-level" (upper case O, lower case l)' },
+  { id:'m33', category:'Capitalisation', severity:'ERROR',
+    find: /\bA-Level\b|\bA-LEVEL\b/g,
+    message: 'Use "A-level" (upper case A, lower case l)' },
+  { id:'m34', category:'Capitalisation', severity:'ERROR',
+    find: /\bO-Level\b|\bO-LEVEL\b/g,
+    message: 'Use "O-level" (upper case O, lower case l)' },
+
+  // ── ADDITIONAL SPELLING RULES ─────────────────────────────
+
+  { id:'x01', category:'Spelling', severity:'ERROR',
+    find: /\bfocussed\b/gi,
+    message: 'Use "focused" not "focussed"' },
+  { id:'x02', category:'Spelling', severity:'ERROR',
+    find: /\bskillful\b|\bskilfully\b/gi,
+    message: 'Use "skilful" / "skilfully" (UK spelling, one l)' },
+  { id:'x03', category:'Spelling', severity:'ERROR',
+    find: /\bdistill\b/gi,
+    message: 'Use "distil" not "distill" (UK spelling)' },
+  { id:'x04', category:'Spelling', severity:'ERROR',
+    find: /\binstill\b/gi,
+    message: 'Use "instil" not "instill" (UK spelling)' },
+  { id:'x05', category:'Spelling', severity:'ERROR',
+    find: /\binstallment\b/gi,
+    message: 'Use "instalment" not "installment" (UK spelling)' },
+  { id:'x06', category:'Spelling', severity:'ERROR',
+    find: /\bbenefitted\b|\bbenefitting\b/gi,
+    message: 'Use "benefited" / "benefiting" (one t)' },
+  { id:'x07', category:'Spelling', severity:'ERROR',
+    find: /\backnowledgment\b/gi,
+    message: 'Use "acknowledgement" not "acknowledgment"' },
+  { id:'x08', category:'Spelling', severity:'INFO',
+    find: /\bnaïve\b|\bnaïvely\b|\bnaïvety\b/gi,
+    message: 'Style guide specifies "naive", "naively", "naivety" — no accent' },
+  { id:'x09', category:'Spelling', severity:'INFO',
+    find: /\blearned\b/gi,
+    message: 'Check: use "learnt" for past tense of "to learn"; "learned" only as an adjective meaning scholarly' },
+  { id:'x10', category:'Spelling', severity:'INFO',
+    find: /\bjudgement\b/gi,
+    message: 'Check: use "judgment" for legal contexts; "judgement" in all other cases' },
+  { id:'x11', category:'Spelling', severity:'ERROR',
+    find: /\bjudgment\b/gi,
+    message: 'Check: use "judgment" only for legal contexts; "judgement" in all other cases' },
+  { id:'x12', category:'Spelling', severity:'ERROR',
+    find: /\bsergeant at arms\b|\bSergeant at Arms\b/gi,
+    message: 'Use "serjeant at arms" (not sergeant)' },
+
+  // ── ADDITIONAL CAPITALISATION RULES ───────────────────────
+
+  { id:'x13', category:'Capitalisation', severity:'ERROR',
+    find: /\bmiddle east\b/gi,
+    message: 'Use "Middle East" (upper case)' },
+  { id:'x14', category:'Capitalisation', severity:'ERROR',
+    find: /\bthe troubles\b/gi,
+    message: 'Use "the Troubles" (upper case T)' },
+  { id:'x15', category:'Capitalisation', severity:'ERROR',
+    find: /\bparis agreement\b/gi,
+    message: 'Use "the Paris Agreement" (upper case)' },
+  { id:'x16', category:'Capitalisation', severity:'ERROR',
+    find: /\bUKIP\b/g,
+    message: 'Use "Ukip" not "UKIP" — pronounced as a word, so initial cap only' },
+  { id:'x17', category:'Capitalisation', severity:'ERROR',
+    find: /\bPLC\b/g,
+    message: 'Use "plc" (all lowercase)' },
+  { id:'x18', category:'Capitalisation', severity:'ERROR',
+    find: /\bNobel Peace Prize\b|\bNobel prize\b/g,
+    message: 'Use "Nobel peace prize" or "Nobel prize for peace" (lowercase p)' },
+  { id:'x19', category:'Capitalisation', severity:'WARNING',
+    find: /\bwhite paper\b/gi,
+    message: 'Check: use "White Paper" when giving a full title (The Levelling Up White Paper); "white paper" in general references' },
+  { id:'x20', category:'Capitalisation', severity:'WARNING',
+    find: /\bgreen paper\b/gi,
+    message: 'Check: use "Green Paper" when giving a full title; "green paper" in general references' },
+  { id:'x21', category:'Capitalisation', severity:'ERROR',
+    find: /\bWorld Trade Organisation\b/g,
+    message: 'Use "World Trade Organization" — note American spelling of Organization (per style guide)' },
+  { id:'x22', category:'Capitalisation', severity:'ERROR',
+    find: /\bd-day\b/gi,
+    message: 'Use "D-Day" (upper case)' },
+  { id:'x23', category:'Capitalisation', severity:'ERROR',
+    find: /\bve-day\b/gi,
+    message: 'Use "VE-Day" (upper case)' },
+  { id:'x24', category:'Capitalisation', severity:'ERROR',
+    find: /\bvj-day\b/gi,
+    message: 'Use "VJ-Day" (upper case)' },
+
+  // ── ADDITIONAL HYPHENATION & FORM RULES ───────────────────
+
+  { id:'x25', category:'Hyphenation', severity:'ERROR',
+    find: /\bfilm maker\b|\bfilmmaker\b/gi,
+    message: 'Use "film-maker" (hyphenated)' },
+  { id:'x26', category:'Hyphenation', severity:'ERROR',
+    find: /\bfirst past the post\b/gi,
+    message: 'Use "first-past-the-post" (fully hyphenated)' },
+  { id:'x27', category:'Hyphenation', severity:'ERROR',
+    find: /\bnon disclosure agreement\b|\bnondisclosure agreement\b/gi,
+    message: 'Use "non-disclosure agreement" (hyphenated)' },
+  { id:'x28', category:'Hyphenation', severity:'ERROR',
+    find: /\bthinktank\b/gi,
+    message: 'Use "think tank" (two words)' },
+  { id:'x29', category:'Hyphenation', severity:'ERROR',
+    find: /\bderisking\b|\bde risking\b/gi,
+    message: 'Use "de-risking" (hyphenated)' },
+  { id:'x30', category:'Hyphenation', severity:'ERROR',
+    find: /\bfilm-goer\b|\bfilmgoer\b/gi,
+    message: 'Use "filmgoer" (one word)' },
+
+  // ── FINAL BATCH: REMAINING STYLE GUIDE RULES ─────────────
+
+  { id:'z01', category:'Spelling', severity:'ERROR',
+    find: /\bcliché\b/gi,
+    message: 'Use "cliche" — style guide specifies no accent' },
+  { id:'z02', category:'Spelling', severity:'ERROR',
+    find: /\bcrèche\b/gi,
+    message: 'Use "creche" — style guide specifies no accent' },
+  { id:'z03', category:'Spelling', severity:'ERROR',
+    find: /\bdisorient\b(?!ate)/gi,
+    message: 'Use "disorientate" not "disorient"' },
+  { id:'z04', category:'Spelling', severity:'ERROR',
+    find: /\bdespatched\b/gi,
+    message: 'Use "dispatched" not "despatched"' },
+  { id:'z05', category:'Spelling', severity:'ERROR',
+    find: /\bdespatch\b/gi,
+    message: 'Use "dispatch" not "despatch" (except "despatch box" in Commons context)' },
+  { id:'z06', category:'Spelling', severity:'ERROR',
+    find: /\blikeable\b/gi,
+    message: 'Use "likable" not "likeable"' },
+  { id:'z07', category:'Spelling', severity:'ERROR',
+    find: /\bloveable\b/gi,
+    message: 'Use "lovable" not "loveable"' },
+  { id:'z08', category:'Spelling', severity:'ERROR',
+    find: /\bchangeable\b/gi,
+    message: 'Check spelling: "changeable" (this is correct — just confirming)' },
+  { id:'z09', category:'Spelling', severity:'ERROR',
+    find: /\bjoky\b/gi,
+    message: 'Use "jokey" not "joky"' },
+  { id:'z10', category:'Spelling', severity:'ERROR',
+    find: /\bvis-a-vis\b|\bvis a vis\b/gi,
+    message: 'Use "vis-à-vis" (with accent)' },
+  { id:'z11', category:'Spelling', severity:'WARNING',
+    find: /\bcanvas\b/gi,
+    message: 'Check: "canvas" = tent/painting surface; "canvass" = to solicit votes. Correct word for context?' },
+  { id:'z12', category:'Spelling', severity:'ERROR',
+    find: /\bbachelor's degree\b|\bmaster's degree\b/gi,
+    message: 'Check apostrophe: "bachelor\'s degree" and "master\'s degree" (apostrophe before the s)' },
+  { id:'z13', category:'Spelling', severity:'ERROR',
+    find: /\bbachelors degree\b|\bmasters degree\b/gi,
+    message: 'Use "bachelor\'s degree" / "master\'s degree" (apostrophe required)' },
+  { id:'z14', category:'Spelling', severity:'ERROR',
+    find: /\bdo's and don'ts\b|\bdos and don'ts\b/gi,
+    message: 'Use "dos and don\'ts" (no apostrophe in dos)' },
+
+  // ── CAPITALISATION: FINAL BATCH ───────────────────────────
+
+  { id:'z15', category:'Capitalisation', severity:'WARNING',
+    find: /\b(spring|summer|autumn|winter)\b/g,
+    message: 'Seasons are lowercase: spring, summer, autumn, winter — check this is not part of a proper name' },
+  { id:'z16', category:'Capitalisation', severity:'ERROR',
+    find: /\bsupreme court\b/gi,
+    message: 'Use "Supreme Court" (upper case)' },
+  { id:'z17', category:'Capitalisation', severity:'ERROR',
+    find: /\bhigh court\b/gi,
+    message: 'Use "High Court" (upper case)' },
+  { id:'z18', category:'Capitalisation', severity:'ERROR',
+    find: /\bindustrial revolution\b/gi,
+    message: 'Use "Industrial Revolution" (upper case)' },
+  { id:'z19', category:'Capitalisation', severity:'ERROR',
+    find: /\bgeneva conventions\b/gi,
+    message: 'Use "Geneva Conventions" (upper case)' },
+  { id:'z20', category:'Capitalisation', severity:'ERROR',
+    find: /\bolympic games\b|\bthe olympics\b/gi,
+    message: 'Use "Olympic Games" or "the Olympics" (upper case)' },
+  { id:'z21', category:'Capitalisation', severity:'ERROR',
+    find: /\bUnion Jack\b/g,
+    message: 'Use "union jack" (all lowercase)' },
+  { id:'z22', category:'Capitalisation', severity:'ERROR',
+    find: /\bVitamin\b/g,
+    message: 'Use "vitamin" (lowercase v) — e.g. vitamin C, vitamin D' },
+  { id:'z23', category:'Capitalisation', severity:'ERROR',
+    find: /\bold labour\b/gi,
+    message: 'Use "old Labour" (lowercase o, upper case L)' },
+  { id:'z24', category:'Capitalisation', severity:'ERROR',
+    find: /\bnew labour\b/gi,
+    message: 'Use "New Labour" (upper case N and L)' },
+  { id:'z25', category:'Capitalisation', severity:'ERROR',
+    find: /\bnational living wage\b/gi,
+    message: 'Use "national living wage" (all lowercase)' },
+  { id:'z26', category:'Capitalisation', severity:'ERROR',
+    find: /\bOccupied Palestinian Territories\b/g,
+    message: 'Use "occupied Palestinian territories" (lowercase o and t)' },
+  { id:'z27', category:'Capitalisation', severity:'ERROR',
+    find: /\bboat race\b/gi,
+    message: 'Use "Boat Race" (upper case)' },
+  { id:'z28', category:'Capitalisation', severity:'ERROR',
+    find: /\bdeepfake\b/gi,
+    message: 'Use "Deepfake" (upper case D)' },
+  { id:'z29', category:'Capitalisation', severity:'ERROR',
+    find: /\bzeitgeist\b/gi,
+    message: 'Use "Zeitgeist" (upper case Z)' },
+  { id:'z30', category:'Capitalisation', severity:'ERROR',
+    find: /\bprotestant\b/gi,
+    message: 'Use "Protestant" (upper case P)' },
+  { id:'z31', category:'Capitalisation', severity:'ERROR',
+    find: /\bcatch-22\b/gi,
+    message: 'Check: use "catch-22" (lowercase) as a general phrase; "Catch-22" (upper case) only when referencing the Joseph Heller novel' },
+
+  // ── HYPHENATION: FINAL BATCH ──────────────────────────────
+
+  { id:'z32', category:'Hyphenation', severity:'ERROR',
+    find: /\bknock-out\b|\bknock out\b/gi,
+    message: 'Use "knockout" (one word) as noun/adjective; "knock out" (two words) as verb' },
+  { id:'z33', category:'Hyphenation', severity:'ERROR',
+    find: /\blooked after children\b/gi,
+    message: 'Use "looked-after children" (hyphenated)' },
+  { id:'z34', category:'Hyphenation', severity:'ERROR',
+    find: /\bmini budget\b|\bmini-budget\b/gi,
+    message: 'Use "mini-Budget" (hyphenated, upper case B)' },
+  { id:'z35', category:'Hyphenation', severity:'ERROR',
+    find: /\bpre school\b|\bpreschool\b/gi,
+    message: 'Use "pre-school" (hyphenated)' },
+  { id:'z36', category:'Hyphenation', severity:'ERROR',
+    find: /\bsixth form college\b/gi,
+    message: 'Use "sixth-form college" (hyphenated); "sixth former" as two words' },
+  { id:'z37', category:'Hyphenation', severity:'ERROR',
+    find: /\bsixth-former\b/gi,
+    message: 'Use "sixth former" (two words, no hyphen)' },
+  { id:'z38', category:'Hyphenation', severity:'ERROR',
+    find: /\bcar worker\b/gi,
+    message: 'Use "care worker" (check spelling)' },
+  { id:'z39', category:'Hyphenation', severity:'ERROR',
+    find: /\bdouble-decker\b|\bdouble decker\b/gi,
+    message: 'Use "doubledecker" (one word)' },
+  { id:'z40', category:'Hyphenation', severity:'ERROR',
+    find: /\ball-comers\b|\ball comers\b/gi,
+    message: 'Use "allcomers" (one word)' },
+
+];
+
+// ─────────────────────────────────────────────────────────────
+// CHECKER ENGINE
+// ─────────────────────────────────────────────────────────────
+
+function runChecks(text) {
+  const findings = [];
+  const seenMatches = new Set(); // avoid duplicates
+
+  RULES.forEach(rule => {
+    rule.find.lastIndex = 0; // reset regex state
+    let match;
+    const regex = new RegExp(rule.find.source, rule.find.flags);
+
+    while ((match = regex.exec(text)) !== null) {
+      const found = match[0];
+      const key = rule.id + '::' + found.toLowerCase();
+      if (seenMatches.has(key)) continue;
+      seenMatches.add(key);
+
+      // Get surrounding context (up to 80 chars each side)
+      const start = Math.max(0, match.index - 60);
+      const end = Math.min(text.length, match.index + found.length + 60);
+      let context = text.slice(start, end).replace(/\n/g, ' ').trim();
+      if (start > 0) context = '…' + context;
+      if (end < text.length) context = context + '…';
+
+      findings.push({
+        ruleId: rule.id,
+        category: rule.category,
+        severity: rule.severity,
+        found,
+        context,
+        message: rule.message,
+        index: match.index
+      });
+    }
+  });
+
+  // Sort: errors first, then warnings, then info; then by position in text
+  const order = { ERROR: 0, WARNING: 1, INFO: 2 };
+  findings.sort((a, b) => {
+    if (order[a.severity] !== order[b.severity]) return order[a.severity] - order[b.severity];
+    return a.index - b.index;
+  });
+
+  return findings;
+}
+
+// ─────────────────────────────────────────────────────────────
+// UI
+// ─────────────────────────────────────────────────────────────
+
+let allFindings = [];
+let activeFilter = 'ALL';
+
+function updateMeta() {
+  const text = document.getElementById('articleText').value.trim();
+  const words = text ? text.split(/\s+/).length : 0;
+  document.getElementById('charCount').textContent = words.toLocaleString() + ' word' + (words !== 1 ? 's' : '');
+}
+
+function clearAll() {
+  document.getElementById('articleText').value = '';
+  updateMeta();
+  document.getElementById('statusDot').className = 'status-dot';
+  document.getElementById('statusText').textContent = 'Ready — paste article and click Check';
+  document.getElementById('resultsLabel').textContent = 'Awaiting check';
+  document.getElementById('resultsArea').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">📰</div>
+      <p>Paste your article on the left and click Check to scan for style guide violations.</p>
+    </div>`;
+  document.getElementById('grammarArea').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">✍️</div>
+      <p>Click "Check Style Guide &amp; Grammar" to also run a grammar check via LanguageTool.</p>
+    </div>`;
+  allFindings = [];
+}
+
+function checkArticle() {
+  const text = document.getElementById('articleText').value;
+  if (!text.trim()) { alert('Please paste an article to check.'); return; }
+
+  // Style check (instant)
+  allFindings = runChecks(text);
+  activeFilter = 'ALL';
+  renderResults();
+
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot done';
+  const n = allFindings.length;
+  document.getElementById('statusText').textContent =
+    n === 0 ? 'No style issues — grammar check running…' :
+    `${n} style issue${n !== 1 ? 's' : ''} found — grammar check running…`;
+  document.getElementById('resultsLabel').textContent =
+    n === 0 ? 'Style: clear' : `Style: ${n} issue${n !== 1 ? 's' : ''}`;
+
+  // Grammar check (async, via LanguageTool)
+  runGrammarCheck(text).then(() => {
+    const grammarCount = document.getElementById('grammarArea').querySelectorAll('.issue-item').length;
+    document.getElementById('statusText').textContent =
+      `Style: ${n} issue${n !== 1 ? 's' : ''} · Grammar: ${grammarCount} issue${grammarCount !== 1 ? 's' : ''}`;
+  });
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  renderResults();
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.filter === f);
+  });
+}
+
+function renderResults() {
+  const area = document.getElementById('resultsArea');
+  if (allFindings.length === 0) {
+    area.innerHTML = `
+      <div class="all-clear">
+        <div class="all-clear-icon">✅</div>
+        <h3>All clear!</h3>
+        <p>No style guide violations detected in this article.</p>
+      </div>`;
+    return;
+  }
+
+  const errors = allFindings.filter(f => f.severity === 'ERROR').length;
+  const warnings = allFindings.filter(f => f.severity === 'WARNING').length;
+  const infos = allFindings.filter(f => f.severity === 'INFO').length;
+
+  const filtered = activeFilter === 'ALL' ? allFindings :
+    allFindings.filter(f => f.severity === activeFilter);
+
+  // Group by category
+  const grouped = {};
+  filtered.forEach(f => {
+    if (!grouped[f.category]) grouped[f.category] = [];
+    grouped[f.category].push(f);
+  });
+
+  let html = `
+    <div class="summary-banner">
+      <span class="summary-title">${allFindings.length} issue${allFindings.length !== 1 ? 's' : ''} found</span>
+      <div class="summary-counts">
+        ${errors ? `<span class="count-pill error">${errors} Error${errors !== 1 ? 's' : ''}</span>` : ''}
+        ${warnings ? `<span class="count-pill warning">${warnings} Check${warnings !== 1 ? 's' : ''}</span>` : ''}
+        ${infos ? `<span class="count-pill info">${infos} Note${infos !== 1 ? 's' : ''}</span>` : ''}
+      </div>
+    </div>
+    <div class="filter-bar">
+      <span style="font-family:'DM Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.15em;color:var(--mid);margin-right:4px;align-self:center;">Filter:</span>
+      <button class="filter-btn ${activeFilter==='ALL'?'active':''}" data-filter="ALL" onclick="setFilter('ALL')">All (${allFindings.length})</button>
+      ${errors ? `<button class="filter-btn ${activeFilter==='ERROR'?'active':''}" data-filter="ERROR" onclick="setFilter('ERROR')">Errors (${errors})</button>` : ''}
+      ${warnings ? `<button class="filter-btn ${activeFilter==='WARNING'?'active':''}" data-filter="WARNING" onclick="setFilter('WARNING')">Checks (${warnings})</button>` : ''}
+      ${infos ? `<button class="filter-btn ${activeFilter==='INFO'?'active':''}" data-filter="INFO" onclick="setFilter('INFO')">Notes (${infos})</button>` : ''}
+    </div>
+    <div class="issues-list">`;
+
+  if (Object.keys(grouped).length === 0) {
+    html += `<div class="empty-state" style="min-height:200px;"><p>No issues in this category.</p></div>`;
+  } else {
+    Object.entries(grouped).forEach(([cat, items]) => {
+      html += `<div class="section-divider">${cat} — ${items.length} issue${items.length!==1?'s':''}</div>`;
+      items.forEach(item => {
+        const sevLabel = { ERROR: '● Error', WARNING: '◆ Check', INFO: '○ Note' }[item.severity];
+        const ctx = escHtml(item.context).replace(
+          escHtml(item.found),
+          `<mark class="highlight">${escHtml(item.found)}</mark>`
+        );
+        html += `
+          <div class="issue-item">
+            <div><span class="severity-badge ${item.severity.toLowerCase()}">${sevLabel}</span></div>
+            <div>
+              <p class="issue-text">${escHtml(item.message)}</p>
+              <div class="issue-found">Found: "${escHtml(item.found)}"</div>
+              <p class="issue-context">${ctx}</p>
+            </div>
+          </div>`;
+      });
+    });
+  }
+
+  html += '</div>';
+  area.innerHTML = html;
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+// ─────────────────────────────────────────────────────────────
+// TAB SWITCHER
+// ─────────────────────────────────────────────────────────────
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ─────────────────────────────────────────────────────────────
+// LANGUAGETOOL GRAMMAR CHECK
+// ─────────────────────────────────────────────────────────────
+
+// Category labels for LanguageTool rule categories
+const LT_CATEGORY_LABELS = {
+  'GRAMMAR': 'Grammar',
+  'TYPOS': 'Spelling',
+  'PUNCTUATION': 'Punctuation',
+  'CASING': 'Capitalisation',
+  'REDUNDANCY': 'Redundancy',
+  'STYLE': 'Style',
+  'CONFUSED_WORDS': 'Confused Words',
+  'COLLOCATIONS': 'Word Choice',
+  'COMPOUNDING': 'Compounding',
+  'TYPOGRAPHY': 'Typography',
+  'MISC': 'Miscellaneous',
+};
+
+async function runGrammarCheck(text) {
+  const grammarArea = document.getElementById('grammarArea');
+  grammarArea.innerHTML = `
+    <div class="lt-loading">
+      <div class="spinner" style="width:28px;height:28px;border-width:3px;"></div>
+      <p>Checking grammar via LanguageTool…</p>
+    </div>`;
+
+  try {
+    const params = new URLSearchParams();
+    params.append('text', text);
+    params.append('language', 'en-GB');
+    // Disable rules that duplicate our style checker or are too noisy
+    params.append('disabledRules', 'WHITESPACE_RULE,EN_QUOTES,COMMA_PARENTHESIS_WHITESPACE,UPPERCASE_SENTENCE_START');
+
+    const resp = await fetch('https://api.languagetool.org/v2/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
+    });
+
+    if (!resp.ok) throw new Error('LanguageTool API returned ' + resp.status);
+    const data = await resp.json();
+    renderGrammarResults(data.matches || [], text);
+
+  } catch(err) {
+    grammarArea.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <p>Grammar check failed. This feature requires an internet connection. Check your connection and try again.</p>
+        <p style="font-size:11px;margin-top:8px;opacity:0.5;">${err.message}</p>
+      </div>`;
+  }
+}
+
+function renderGrammarResults(matches, text) {
+  const grammarArea = document.getElementById('grammarArea');
+
+  if (matches.length === 0) {
+    grammarArea.innerHTML = `
+      <div class="all-clear">
+        <div class="all-clear-icon">✅</div>
+        <h3>No grammar issues!</h3>
+        <p>LanguageTool found no grammar or spelling errors in this article.</p>
+      </div>`;
+    return;
+  }
+
+  // Group by category
+  const grouped = {};
+  matches.forEach(m => {
+    const rawCat = m.rule && m.rule.category ? m.rule.category.id : 'MISC';
+    const cat = LT_CATEGORY_LABELS[rawCat] || rawCat;
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(m);
+  });
+
+  let html = `
+    <div class="summary-banner">
+      <span class="summary-title">${matches.length} grammar issue${matches.length !== 1 ? 's' : ''} found</span>
+      <div class="summary-counts">
+        <span class="count-pill info" style="background:var(--info);">${matches.length} via LanguageTool</span>
+      </div>
+    </div>
+    <div class="issues-list">`;
+
+  Object.entries(grouped).forEach(([cat, items]) => {
+    html += `<div class="section-divider">${cat} — ${items.length} issue${items.length !== 1 ? 's' : ''}</div>`;
+    items.forEach(m => {
+      const offset = m.offset;
+      const len = m.length;
+      const found = text.slice(offset, offset + len);
+      const ctxStart = Math.max(0, offset - 55);
+      const ctxEnd = Math.min(text.length, offset + len + 55);
+      let ctx = text.slice(ctxStart, ctxEnd).replace(/\n/g, ' ').trim();
+      if (ctxStart > 0) ctx = '…' + ctx;
+      if (ctxEnd < text.length) ctx = ctx + '…';
+
+      const suggestions = m.replacements && m.replacements.length
+        ? m.replacements.slice(0, 3).map(r => `"${escHtml(r.value)}"`).join(', ')
+        : null;
+
+      const highlightedCtx = escHtml(ctx).replace(
+        escHtml(found),
+        `<mark class="highlight">${escHtml(found)}</mark>`
+      );
+
+      html += `
+        <div class="issue-item">
+          <div><span class="severity-badge warning">◆ Check</span></div>
+          <div>
+            <p class="issue-text">${escHtml(m.message)}</p>
+            ${found ? `<div class="issue-found">Found: "${escHtml(found)}"</div>` : ''}
+            ${suggestions ? `<p class="issue-rule" style="margin-top:4px;">Suggestion${m.replacements.length > 1 ? 's' : ''}: ${suggestions}</p>` : ''}
+            <p class="issue-context">${highlightedCtx}</p>
+          </div>
+        </div>`;
+    });
+  });
+
+  html += '</div>';
+  grammarArea.innerHTML = html;
+}
+</script>
+</body>
+</html>
