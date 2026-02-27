@@ -1,9 +1,28 @@
 const fs = require('fs');
 const vm = require('vm');
 
+const SCRIPT_BLOCK_RE = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
+const RULES_MARKER = '// RULES ENGINE';
+
+function extractCheckerScript(html) {
+  const scriptBlocks = [...html.matchAll(SCRIPT_BLOCK_RE)];
+  if (!scriptBlocks.length) {
+    throw new Error('No <script> blocks found in index.html. Add an inline checker script containing "// RULES ENGINE".');
+  }
+
+  const markedBlocks = scriptBlocks.filter((match) => match[1].includes(RULES_MARKER));
+  if (markedBlocks.length === 1) return markedBlocks[0][1];
+
+  if (!markedBlocks.length) {
+    if (scriptBlocks.length === 1) return scriptBlocks[0][1];
+    throw new Error(`Found ${scriptBlocks.length} <script> blocks in index.html but none include "${RULES_MARKER}". Mark the checker script explicitly.`);
+  }
+
+  throw new Error(`Found ${markedBlocks.length} <script> blocks containing "${RULES_MARKER}". Keep exactly one checker script block.`);
+}
+
 const html = fs.readFileSync('index.html', 'utf8');
-const js = html.match(/<script>([\s\S]*)<\/script>/)?.[1];
-if (!js) throw new Error('Script block not found');
+const js = extractCheckerScript(html);
 
 const sandbox = {
   console,
