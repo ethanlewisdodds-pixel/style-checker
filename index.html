@@ -1480,23 +1480,36 @@ function levenshtein(a, b) {
   return dp[m][n];
 }
 
+function normalizeTypoToken(value) {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z]/g, '');
+}
+
 function runTypoChecks(text) {
   const dictionary = ['Thérèse','Coffey','antisemitism','antisemitic','policymaking','policymaker','taskforce','postmortem','Partygate','Crown Court','Supreme Court'];
+  const veryCommonShortWords = new Set(['these', 'those', 'there', 'three']);
   const findings = [];
   const tokenRe = /\b[A-Za-z][A-Za-z-]{3,}\b/g;
   let m;
   while ((m = tokenRe.exec(text)) !== null) {
     const token = m[0];
     if (/^[A-Z]{2,}$/.test(token)) continue;
-    const normalized = token.toLowerCase();
+    const cand = normalizeTypoToken(token);
+    if (!cand) continue;
     let best = null;
     for (const word of dictionary) {
-      const target = word.toLowerCase().replace(/[^a-z]/g, '');
-      const cand = normalized.replace(/[^a-z]/g, '');
+      const target = normalizeTypoToken(word);
       if (!target || !cand) continue;
       const dist = levenshtein(cand, target);
       const max = cand.length >= 8 ? 2 : 1;
-      if (dist > 0 && dist <= max) {
+      const sameBaseSpellingDifferentDiacritics =
+        dist === 0 && token.toLowerCase() !== word.toLowerCase();
+      const isProperNameEntry = /^[A-ZÀ-ÖØ-Þ]/.test(word);
+      if (veryCommonShortWords.has(cand) && isProperNameEntry && dist <= max) continue;
+      if ((dist > 0 && dist <= max) || sameBaseSpellingDifferentDiacritics) {
         if (!best || dist < best.dist) best = { word, dist };
       }
     }
