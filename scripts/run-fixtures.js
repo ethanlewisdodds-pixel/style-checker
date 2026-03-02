@@ -43,6 +43,11 @@ for (const fx of fixtures) {
   const findings = sandbox.runChecks(fx.text);
   const ids = new Set(findings.map(f => f.ruleId));
 
+  const countsByRule = findings.reduce((acc, finding) => {
+    acc[finding.ruleId] = (acc[finding.ruleId] || 0) + 1;
+    return acc;
+  }, {});
+
   for (const id of fx.expectPresent || []) {
     if (!ids.has(id)) {
       console.error(`[FAIL] ${fx.name}: missing expected rule ${id}`);
@@ -53,6 +58,15 @@ for (const fx of fixtures) {
   for (const id of fx.expectAbsent || []) {
     if (ids.has(id)) {
       console.error(`[FAIL] ${fx.name}: unexpected rule ${id}`);
+      failed++;
+      fixtureFailed++;
+    }
+  }
+
+  for (const [id, expectedCount] of Object.entries(fx.expectCountByRule || {})) {
+    const actualCount = countsByRule[id] || 0;
+    if (actualCount !== expectedCount) {
+      console.error(`[FAIL] ${fx.name}: expected ${id} count ${expectedCount}, got ${actualCount}`);
       failed++;
       fixtureFailed++;
     }

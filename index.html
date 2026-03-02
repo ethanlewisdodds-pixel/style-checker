@@ -1355,7 +1355,6 @@ const SUPPLEMENTAL_RULES = [
   { id:'sx22', category:'Hyphenation', severity:'ERROR', find:/\btask force\b/gi, message:'Use "taskforce" (one word)' },
   { id:'sx23', category:'Hyphenation', severity:'ERROR', find:/\bpost mortem\b/gi, message:'Use "postmortem" (one word)' },
   { id:'sx24', category:'Punctuation', severity:'ERROR', find:/\b\d{1,2}[-–]\d{1,2}[-–]year[- ]olds\b/gi, message:'Age ranges should be in style like "9- to 12-year-olds"' },
-  { id:'sx26', category:'Acronyms', severity:'WARNING', find:/\bEU\b|\bUK\b|\bUS\b/g, message:'On first mention, spell out European Union, United Kingdom and United States' },
   { id:'sx27', category:'Word Choice', severity:'ERROR', find:/\bjuvenile courts\b/gi, message:'Use "youth courts"' },
   { id:'sx28', category:'Word Choice', severity:'ERROR', find:/\bthe Yemen\b/g, message:'Use "Yemen" not "the Yemen"' },
   { id:'sx29', category:'Word Choice', severity:'ERROR', find:/\bwelsh office\b/gi, message:'Use "Wales Office" not "Welsh Office"' },
@@ -1393,7 +1392,7 @@ function isSoftwareContext(text, index) {
 const RULE_CONFIDENCE = {
   p03: 'high', p04: 'high', p05: 'high', n01: 'high',
   s34: 'high', s35: 'high', sx11: 'high', sx23: 'high', sx22: 'high',
-  sx26: 'medium', c22: 'medium', c23: 'medium', c24: 'medium', c25: 'medium'
+  c22: 'medium', c23: 'medium', c24: 'medium', c25: 'medium'
 };
 
 const RULE_GUARDS = {

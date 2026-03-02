@@ -7,9 +7,9 @@
       "s34",
       "p03",
       "sx11",
-      "sx22",
-      "sx23",
-      "sx28"
+      "h12",
+      "h20",
+      "m08"
     ],
     "expectAbsent": []
   },
@@ -22,12 +22,36 @@
     ]
   },
   {
-    "name": "first mention acronym",
+    "name": "acronym warning when short form comes first",
     "text": "The EU announced changes today.",
     "expectPresent": [
       "ac01"
     ],
-    "expectAbsent": []
+    "expectAbsent": [
+      "sx26"
+    ]
+  },
+  {
+    "name": "no acronym warning when full form comes first",
+    "text": "The European Union announced changes today. The EU responded.",
+    "expectPresent": [],
+    "expectAbsent": [
+      "ac01",
+      "sx26"
+    ]
+  },
+  {
+    "name": "no duplicate acronym warning for repeated short form",
+    "text": "The EU announced changes today. EU officials responded.",
+    "expectPresent": [
+      "ac01"
+    ],
+    "expectAbsent": [
+      "sx26"
+    ],
+    "expectCountByRule": {
+      "ac01": 1
+    }
   },
   {
     "name": "american spelling suggestions",
