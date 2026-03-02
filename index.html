@@ -789,7 +789,7 @@ const RULES = [
     find: /\bthe (?:duke|duchess|earl|lord|baron|baroness) of\b/gi,
     message: 'Check capitalisation: "the Duke of X" on first mention is upper case; but "the duke" on subsequent mentions is lower case' },
   { id:'c35', category:'Capitalisation', severity:'ERROR',
-    find: /\bGovernment\b/g,
+    find: /\b(?<!Local )Government\b(?!\s+(?:Association\b|and Elections Bill\b))/g,
     message: 'Use "government" in lowercase (e.g. "the UK government", "the government") unless an explicit style-guide exception applies' },
   { id:'c20', category:'Capitalisation', severity:'WARNING',
     find: /\binternet\b/gi,
