@@ -485,8 +485,8 @@ const RULES = [
     find: /\brecognize\b/gi,
     message: 'Use UK spelling: "recognise" not "recognize"' },
   { id:'s11', category:'Spelling', severity:'ERROR',
-    find: /\bfill out a form\b/gi,
-    message: 'Use "fill in a form" not "fill out a form"' },
+    find: /\bfill out\s+(?:a|an|the|this|that|my|your|our|their)?\s*(?:form|forms|survey|questionnaire|document|documents|application)\b/gi,
+    message: 'Use "fill in" (eg "fill in a form") not "fill out" in forms/documents context' },
   { id:'s12', category:'Spelling', severity:'ERROR',
     find: /\balright\b/gi,
     message: 'Use "all right" (two words), not "alright"' },
@@ -554,8 +554,11 @@ const RULES = [
     find: /\banti-semitism\b|\bAnti-Semitism\b/gi,
     message: 'Use "antisemitism" (one word, lowercase s)' },
   { id:'s34', category:'Spelling', severity:'WARNING',
-    find: /\bZelenskyy\b/g,
-    message: 'Use "Zelensky" (one y) per the style guide' },
+    find: /\b(?:Zelenskyy|Zelenski|Zelenskiy|Volodymr\s+Zelensky|Volodymyr\s+Zelenskyy)\b/g,
+    message: 'Use "Volodymyr Zelensky"' },
+  { id:'s38', category:'Spelling', severity:'ERROR',
+    find: /\bGhandi\b/g,
+    message: 'Use "Gandhi" not "Ghandi"' },
   { id:'s35', category:'Spelling', severity:'ERROR',
     find: /\bTherese Coffey\b/g,
     message: 'Use "Thérèse Coffey" (include accents)' },
@@ -637,6 +640,12 @@ const RULES = [
   { id:'p05', category:'Punctuation', severity:'ERROR',
     find: /\d+ (January|February|March|April|May|June|July|August|September|October|November|December),\s+\d{4}/gi,
     message: 'No comma between month and year: "1 March 2021" not "1 March, 2021"' },
+  { id:'p05b', category:'Punctuation', severity:'ERROR',
+    find: /\b(?:January|February|March|April|May|June|July|August|September|October|November|December),\s+\d{4}\b/g,
+    message: 'No comma between month and year: "March 2021" not "March, 2021"' },
+  { id:'p05c', category:'Punctuation', severity:'ERROR',
+    find: /\b(\d{1,2})(st|nd|rd|th)\s+(January|February|March|April|May|June|July|August|September|October|November|December)\b/gi,
+    message: 'Do not use ordinal suffixes in dates: "1 March" not "1st March"' },
   { id:'p06', category:'Punctuation', severity:'ERROR',
     find: /\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/g,
     message: 'Write dates in full: "1 March 2021" not numeric format. Use "to" in date ranges, not slashes.' },
@@ -656,8 +665,14 @@ const RULES = [
     find: /\bSt\.\s/g,
     message: 'Saints: use "St" without full stop (St Martin\'s, not St. Martin\'s)' },
   { id:'p11', category:'Punctuation', severity:'ERROR',
-    find: /\b'(\d{2})\b/g,
+    find: /(?<!\w)'(\d{2})\b/g,
     message: 'Don\'t use apostrophe when abbreviating a year: "97" not "\'97"' },
+  { id:'p11b', category:'Punctuation', severity:'ERROR',
+    find: /\b\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\s*[–\-/]\s*\d{1,2}\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\b/gi,
+    message: 'Use "to" in date ranges (eg "10 November to 21 December"), not dashes or slashes' },
+  { id:'p11c', category:'Punctuation', severity:'ERROR',
+    find: /\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s*[–\-/]\s*(?:January|February|March|April|May|June|July|August|September|October|November|December)\b/g,
+    message: 'Use "to" in date ranges (eg "November to December"), not dashes or slashes' },
   { id:'p13', category:'Punctuation', severity:'WARNING',
     find: /(?<!\b(?:Mr|Mrs|Ms|Dr|Prof|St|Ave|Rd|Jr|Sr|vs|eg|ie|etc|Rev|Hon|Gen|Sgt|Cpl|Col|Ltd|plc|approx|dept|fig|govt|max|min|no|vol|tel))\.\s+[a-z]/g,
     message: 'Possible missing capital letter after a full stop — check if this is the start of a new sentence' },
@@ -688,6 +703,15 @@ const RULES = [
   { id:'n07', category:'Numbers', severity:'WARNING',
     find: /\b[1-9]\b/g,
     message: 'Spell out standalone numbers from one to nine (eg "three" not "3")' },
+  { id:'n08', category:'Numbers', severity:'ERROR',
+    find: /\b(?:1\/2|1\/3|2\/3|1\/4|3\/4)\b/g,
+    message: 'Write common fractions in words (eg "one-half", "two-thirds") rather than numeric notation' },
+  { id:'n09', category:'Numbers', severity:'WARNING',
+    find: /\b\d{1,3}(?:,\d{3}){2,}\s+(?:people|person|persons|households|residents?|patients?|voters?|children|adults|workers|families|dogs?|cats?|horses?|cattle|livestock|animals?)\b/gi,
+    message: 'For people/animals, write large counts as words (eg "14 million people" not "14,000,000 people")' },
+  { id:'n10', category:'Numbers', severity:'ERROR',
+    find: /\b\d+°\s?C\b|\b\d+\s+degrees\s+(?:C|celsius)\b/gi,
+    message: 'Temperature style is "30C" (no degree symbol, no space, capital C)' },
 
   // ── CAPITALISATION ─────────────────────────────────────────
 
@@ -783,8 +807,8 @@ const RULES = [
     find: /\bBank of England\b/g,
     message: 'Check: "Bank of England" should be upper case — but "governor of the Bank of England" stays lowercase' },
   { id:'c32', category:'Capitalisation', severity:'WARNING',
-    find: /\bthe pope\b/gi,
-    message: 'Correct form is "the pope" (lowercase) — but "Pope Francis" is upper case when used as a title before the name' },
+    find: /\b[Tt]he Pope\b/g,
+    message: 'Use "the pope" (lowercase), but "Pope Francis" when used as a title before a name' },
   { id:'c33', category:'Capitalisation', severity:'WARNING',
     find: /\bpresident (?!of the)/gi,
     message: 'Check capitalisation: use "President Biden" (upper case when used as title before name); but "the US president, Joe Biden" (lower case when after "the")' },
@@ -794,6 +818,12 @@ const RULES = [
   { id:'c35', category:'Capitalisation', severity:'ERROR',
     find: /\b(?<!Local )Government\b(?!\s+(?:Association\b|and Elections Bill\b))/g,
     message: 'Use "government" in lowercase (e.g. "the UK government", "the government") unless an explicit style-guide exception applies' },
+  { id:'c36', category:'Capitalisation', severity:'WARNING',
+    find: /\bNorthern Ireland Assembly\b/g,
+    message: 'In running text use "Northern Ireland assembly" (lowercase a) unless giving formal title at first mention' },
+  { id:'c37', category:'Capitalisation', severity:'ERROR',
+    find: /\bWindsor Framework\b/g,
+    message: 'Use "Windsor framework" (lowercase f)' },
   { id:'c20', category:'Capitalisation', severity:'WARNING',
     find: /\binternet\b/gi,
     message: 'Check: "internet" is now standard lowercase' },
@@ -816,11 +846,11 @@ const RULES = [
     find: /\bcyber war\b/gi,
     message: 'Use "cyberwar" (one word)' },
   { id:'h06', category:'Hyphenation', severity:'ERROR',
-    find: /\bback bench\b|\bback-bench\b/gi,
-    message: 'Use "backbench" (one word) as adjective; "backbencher/backbenches" (one word)' },
+    find: /\bback\s+benchers?\b|\bback\s+bencher\b|\bback\s+bench\b|\bback-bench(?:er|ers)?\b/gi,
+    message: 'Use "backbench", "backbencher", "backbenchers" and "backbenches" (one word)' },
   { id:'h07', category:'Hyphenation', severity:'ERROR',
-    find: /\bfrontbench\b|\bfrontbencher\b|\bfrontbenches\b/gi,
-    message: 'Use "front bench" / "front bencher" / "front benches" (two words)' },
+    find: /\bfront\s+bench\b|\bfront\s+bencher\b|\bfront\s+benchers\b|\bfront-bench(?:er|ers)?\b|\bfrontbenches\b/gi,
+    message: 'Use "frontbench" and "frontbencher" (one word), but "front benches" (two words)' },
   { id:'h08', category:'Hyphenation', severity:'ERROR',
     find: /\bpolicy maker\b|\bpolicy-maker\b/gi,
     message: 'Use "policymaker" (one word)' },
@@ -885,8 +915,8 @@ const RULES = [
     find: /\bco operate\b|\bcooperate\b/gi,
     message: 'Use "co-operate" (with hyphen)' },
   { id:'h29', category:'Hyphenation', severity:'ERROR',
-    find: /\bcoordinate\b/gi,
-    message: 'Use "co-ordinate" (with hyphen)' },
+    find: /\bcoordinate\b|\bco\s+ordinated\b|\bco\s+ordinate\b|\bco\s+operation\b|\bco\s+operate\b|\bcoproducer\b/gi,
+    message: 'Use hyphenated co- forms: "co-ordinate", "co-ordinated", "co-operate", "co-operation", "co-producer"' },
   { id:'h30', category:'Hyphenation', severity:'ERROR',
     find: /\bcross party\b/gi,
     message: 'Use "cross-party" (with hyphen)' },
@@ -938,6 +968,18 @@ const RULES = [
   { id:'h46', category:'Hyphenation', severity:'ERROR',
     find: /\banti apartheid\b/gi,
     message: 'Use "anti-apartheid" (hyphenated)' },
+  { id:'h47', category:'Hyphenation', severity:'ERROR',
+    find: /\btick box\s+(exercise|approach|culture|policy|exercise|process|mentality)\b/gi,
+    message: 'Use "tick-box" when used as a compound adjective before a noun' },
+  { id:'h48', category:'Hyphenation', severity:'ERROR',
+    find: /\bshort term\s+(plan|fix|measure|solution|strategy|policy|deal|target|approach|goal|contract|loan|impact|effect|objective|support)\b/gi,
+    message: 'Use "short-term" when used as a compound adjective before a noun' },
+  { id:'h49', category:'Hyphenation', severity:'ERROR',
+    find: /\bunder-mine\b|\bunder-estimate\b|\bunder-report\b|\bunder-perform\b/gi,
+    message: 'Do not hyphenate these forms: "undermine", "underestimate", "underreport", "underperform"' },
+  { id:'h50', category:'Hyphenation', severity:'ERROR',
+    find: /\bcyber attack\b|\bcyber attacks\b|\bcyber army\b|\bcyber risk\b|\bcyber resilience\b|\bcyber hack\b/gi,
+    message: 'Use hyphenated forms: "cyber-attack", "cyber-attacks", "cyber-army", "cyber-risk", "cyber-resilience", "cyber-hack"' },
 
   // ── ACRONYMS ───────────────────────────────────────────────
 
@@ -977,6 +1019,33 @@ const RULES = [
   { id:'a12', category:'Acronyms', severity:'ERROR',
     find: /\bokay\b|\bO\.K\.\b/gi,
     message: 'Use "OK" not "okay" or "O.K."' },
+  { id:'a13', category:'Acronyms', severity:'ERROR',
+    find: /\bDFE\b/g,
+    message: 'Use "DfE" (not "DFE")' },
+  { id:'a15', category:'Acronyms', severity:'ERROR',
+    find: /\bDft\b|\bDFT\b/g,
+    message: 'Use "DfT" (not "DFT")' },
+  { id:'a16', category:'Acronyms', severity:'ERROR',
+    find: /\bDwp\b|\bdwp\b/g,
+    message: 'Use "DWP"' },
+  { id:'a17', category:'Acronyms', severity:'ERROR',
+    find: /\bDhsc\b|\bDHSc\b|\bdhsc\b/g,
+    message: 'Use "DHSC"' },
+  { id:'a18', category:'Acronyms', severity:'ERROR',
+    find: /\bFcdo\b|\bFCDo\b|\bfcdo\b/g,
+    message: 'Use "FCDO"' },
+  { id:'a19', category:'Acronyms', severity:'ERROR',
+    find: /\bMhclg\b|\bmhclg\b/g,
+    message: 'Use "MHCLG"' },
+  { id:'a20', category:'Acronyms', severity:'ERROR',
+    find: /\bBeis\b|\bbeis\b/g,
+    message: 'Use "BEIS"' },
+  { id:'a21', category:'Acronyms', severity:'ERROR',
+    find: /\bDcms\b|\bdcms\b/g,
+    message: 'Use "DCMS"' },
+  { id:'a22', category:'Acronyms', severity:'ERROR',
+    find: /\bHmt\b|\bhmt\b/g,
+    message: 'Use "HMT"' },
 
   // ── STYLE ──────────────────────────────────────────────────
 
@@ -984,7 +1053,7 @@ const RULES = [
     find: /\bAfrican American\b/g,
     message: 'Use "African-American" (hyphenated)' },
   { id:'st02', category:'Style', severity:'WARNING',
-    find: /\bal-Qaeda\b|\bal Qaeda\b|\bAl Qaeda\b|\bAl-Qaeda\b/g,
+    find: /\bal Qaeda\b|\bAl Qaeda\b|\bAl-Qaeda\b/g,
     message: 'Use "al-Qaeda" (lowercase al, hyphen)' },
   { id:'st03', category:'Style', severity:'ERROR',
     find: /Israel Defence Forces|Israeli Defence Forces/g,
@@ -1374,7 +1443,8 @@ const SUPPLEMENTAL_RULES = [
   { id:'sx41', category:'Proper Nouns', severity:'ERROR', find:/\bSinn Fein\b/g, message:'Use "Sinn Féin" (include accent)' },
   { id:'sx42', category:'Proper Nouns', severity:'ERROR', find:/\bHong Kongers\b/gi, message:'Use "Hongkongers" (one word)' },
   { id:'sx43', category:'Formatting', severity:'ERROR', find:/\bNo\.\s?(10|11)\b/g, message:'Use "No 10" / "No 11" (no full stop)' },
-  { id:'sx44', category:'Word Choice', severity:'INFO', find:/\balternatives\b/gi, message:'Check context: use "choice" rather than "alternative" when referring to three or more options' }
+  { id:'sx44', category:'Word Choice', severity:'INFO', find:/\balternatives\b/gi, message:'Check context: use "choice" rather than "alternative" when referring to three or more options' },
+  { id:'sx45', category:'Capitalisation', severity:'WARNING', find:/\b(?:[a-z][a-z]+\s+){0,4}(?:bill|act|reform bill)\b/g, message:'Possible named legislation in lowercase — review for title case (eg "Online Safety Bill")' }
 ];
 
 RULES.push(...SUPPLEMENTAL_RULES);
@@ -1709,7 +1779,19 @@ function runStructureChecks(text) {
           index: lineStart[item.line - 1] || 0
         });
       }
-      if (/\.\s*$/.test(item.text)) {
+      if (/^[A-Z]/.test(item.text)) {
+        findings.push({
+          ruleId: 'sb05',
+          category: 'Structure',
+          severity: 'ERROR',
+          confidence: 'high',
+          found: item.text,
+          context: `line ${item.line}`,
+          message: 'Bullet points should start lowercase',
+          index: lineStart[item.line - 1] || 0
+        });
+      }
+      if (/\.\s*$/.test(item.text) && item.line === block.items[block.items.length - 1].line) {
         findings.push({
           ruleId: 'sb04',
           category: 'Structure',
@@ -1780,6 +1862,58 @@ function runContextualStyleChecks(text) {
   return findings;
 }
 
+function runGlobalIseChecks(text) {
+  const findings = [];
+  const exceptions = new Set(['size','capsize','seize','seized','seizes','seizing','prize','prized','prizes','prizing']);
+  const re = /\b([a-z]+?)ize(d|s|r|rs|ing|ation|ations)?\b/gi;
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const full = m[0];
+    const lower = full.toLowerCase();
+    if (exceptions.has(lower)) continue;
+    const british = lower.replace(/ize/, 'ise');
+    findings.push({
+      ruleId: 'sx46',
+      category: 'Spelling',
+      severity: 'ERROR',
+      confidence: 'medium',
+      found: full,
+      context: makeContext(text, m.index, full.length),
+      message: `Use UK spelling: "${british}" not "${lower}"`,
+      index: m.index
+    });
+  }
+  return findings;
+}
+
+function runGenericAcronymDefinitionChecks(text) {
+  const findings = [];
+  const acronymRe = /\b[A-Z]{2,6}\b/g;
+  const seen = new Set();
+  let m;
+  while ((m = acronymRe.exec(text)) !== null) {
+    const ac = m[0];
+    if (seen.has(ac)) continue;
+    seen.add(ac);
+    if (/^(UK|US|EU|UN|NHS|MP|BBC|ITV|GDP|VAT|HMRC|HMT|DWP|DfE|DfT|DHSC|FCDO|MHCLG|BEIS|DCMS|FOI)$/.test(ac)) continue;
+    const prior = text.slice(0, m.index);
+    const defined = new RegExp(`\b[^\n()]{3,80}\(${ac}\)`).test(prior);
+    if (!defined) {
+      findings.push({
+        ruleId: 'sx47',
+        category: 'Acronyms',
+        severity: 'INFO',
+        confidence: 'low',
+        found: ac,
+        context: makeContext(text, m.index, ac.length),
+        message: `Consider spelling out ${ac} on first mention`,
+        index: m.index
+      });
+    }
+  }
+  return findings;
+}
+
 function runChecks(text, options = {}) {
   const findings = [];
   const seenMatches = new Set();
@@ -1817,6 +1951,8 @@ function runChecks(text, options = {}) {
     ...runTypoChecks(text),
     ...runAmericanSpellingChecks(text),
     ...runContextualStyleChecks(text),
+    ...runGlobalIseChecks(text),
+    ...runGenericAcronymDefinitionChecks(text),
     ...(options.enableStructureChecks === false ? [] : runStructureChecks(text))
   ];
 
