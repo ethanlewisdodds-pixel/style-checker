@@ -531,7 +531,7 @@ const RULES = [
     message: 'Use "impostor" not "imposter"' },
   { id:'s26', category:'Spelling', severity:'INFO',
     find: /\bjudgement\b/gi,
-    message: 'Use "judgment" for legal term only; "judgement" for non-legal usage' },
+    message: 'Legal usage normally prefers "judgment"; non-legal usage can be "judgement"' },
   { id:'s27', category:'Spelling', severity:'ERROR',
     find: /\bfillibuster\b/gi,
     message: 'Use "filibuster" not "fillibuster"' },
@@ -574,12 +574,12 @@ const RULES = [
   { id:'w01', category:'Word Choice', severity:'WARNING',
     find: /\bapproximately\b/gi,
     message: 'Prefer "about" over "approximately"' },
-  { id:'w02', category:'Word Choice', severity:'ERROR',
+  { id:'w02', category:'Word Choice', severity:'WARNING',
     find: /\bimpact on\b/gi,
-    message: 'Avoid "impact on" as a synonym for "affect" — use "affect" or "have an effect on"' },
+    message: 'Check whether "impact on" could be clearer as "affect" or "have an effect on"' },
   { id:'w03', category:'Word Choice', severity:'WARNING',
-    find: /\bcould potentially impact\b|\bmight impact\b|\bwill impact\b/gi,
-    message: 'Avoid using "impact" as a verb — use "affect" instead' },
+    find: /\bimpact\b/gi,
+    message: 'Check whether "impact" is being used as a vague synonym for "affect"' },
   { id:'w04', category:'Word Choice', severity:'ERROR',
     find: /\bfirstly\b/gi,
     message: 'Use "first" not "firstly"; then "secondly, thirdly" etc.' },
@@ -813,8 +813,8 @@ const RULES = [
     find: /\bback bench\b|\bback-bench\b/gi,
     message: 'Use "backbench" (one word) as adjective; "backbencher/backbenches" (one word)' },
   { id:'h07', category:'Hyphenation', severity:'ERROR',
-    find: /\bfront bench\b/gi,
-    message: 'Use "frontbench" (one word); "frontbencher" (one word)' },
+    find: /\bfrontbench\b|\bfrontbencher\b|\bfrontbenches\b/gi,
+    message: 'Use "front bench" / "front bencher" / "front benches" (two words)' },
   { id:'h08', category:'Hyphenation', severity:'ERROR',
     find: /\bpolicy maker\b|\bpolicy-maker\b/gi,
     message: 'Use "policymaker" (one word)' },
@@ -848,9 +848,9 @@ const RULES = [
   { id:'h18', category:'Hyphenation', severity:'ERROR',
     find: /\bwell being\b|\bwell-being\b/gi,
     message: 'Use "wellbeing" (one word)' },
-  { id:'h19', category:'Hyphenation', severity:'ERROR',
-    find: /\broll-out\b|\brollout\b/gi,
-    message: '"Roll out" as verb (two words); "rollout" as noun (one word)' },
+  { id:'h19', category:'Hyphenation', severity:'INFO',
+    find: /\broll-out\b|\brollout\b|\broll out\b/gi,
+    message: 'Check usage: "roll out" as verb (two words); "rollout" as noun (one word)' },
   { id:'h20', category:'Hyphenation', severity:'ERROR',
     find: /\bpost mortem\b|\bpost-mortem\b/gi,
     message: 'Use "postmortem" (one word)' },
@@ -1347,13 +1347,10 @@ const SUPPLEMENTAL_RULES = [
   { id:'sx13', category:'Capitalisation', severity:'ERROR', find:/\bautumn statement\b/gi, message:'Use "Autumn Statement" (upper case)' },
   { id:'sx14', category:'Capitalisation', severity:'ERROR', find:/\bspring statement\b/gi, message:'Use "Spring Statement" (upper case)' },
   { id:'sx16', category:'Hyphenation', severity:'ERROR', find:/\bunderway\b/gi, message:'Use "under way" (two words)' },
-  { id:'sx17', category:'Hyphenation', severity:'ERROR', find:/\bfrontbench\b/gi, message:'Use "front bench" / "front bencher" (two words)' },
   { id:'sx18', category:'Hyphenation', severity:'ERROR', find:/\bback bencher\b/gi, message:'Use "backbencher" (one word)' },
   { id:'sx19', category:'Hyphenation', severity:'ERROR', find:/\bpolicy[- ]maker\b|\bpolicy[- ]making\b/gi, message:'Use "policymaker" and "policymaking" (one word)' },
   { id:'sx20', category:'Hyphenation', severity:'ERROR', find:/\btime frame\b/gi, message:'Use "timeframe" (one word)' },
   { id:'sx21', category:'Hyphenation', severity:'ERROR', find:/\btime scale\b/gi, message:'Use "timescale" (one word)' },
-  { id:'sx22', category:'Hyphenation', severity:'ERROR', find:/\btask force\b/gi, message:'Use "taskforce" (one word)' },
-  { id:'sx23', category:'Hyphenation', severity:'ERROR', find:/\bpost mortem\b/gi, message:'Use "postmortem" (one word)' },
   { id:'sx24', category:'Punctuation', severity:'ERROR', find:/\b\d{1,2}[-–]\d{1,2}[-–]year[- ]olds\b/gi, message:'Age ranges should be in style like "9- to 12-year-olds"' },
   { id:'sx27', category:'Word Choice', severity:'ERROR', find:/\bjuvenile courts\b/gi, message:'Use "youth courts"' },
   { id:'sx28', category:'Word Choice', severity:'ERROR', find:/\bthe Yemen\b/g, message:'Use "Yemen" not "the Yemen"' },
@@ -1391,7 +1388,7 @@ function isSoftwareContext(text, index) {
 
 const RULE_CONFIDENCE = {
   p03: 'high', p04: 'high', p05: 'high', n01: 'high',
-  s34: 'high', s35: 'high', sx11: 'high', sx23: 'high', sx22: 'high',
+  s34: 'high', s35: 'high', sx11: 'high',
   c22: 'medium', c23: 'medium', c24: 'medium', c25: 'medium'
 };
 
@@ -1435,18 +1432,24 @@ function runGrammarChecks(text) {
   return results;
 }
 
-function runAcronymFirstMentionChecks(text) {
-  const checks = [
-    { short: /\bEU\b/g, full: /European Union/i, message: 'Spell out "European Union" on first mention, then EU', id: 'ac01' },
-    { short: /\bUK\b/g, full: /United Kingdom/i, message: 'Spell out "United Kingdom" on first mention, then UK', id: 'ac02' },
-    { short: /\bUS\b/g, full: /United States/i, message: 'Spell out "United States" on first mention, then US', id: 'ac03' }
-  ];
+const ACRONYM_FIRST_MENTION_RULES = [
+  { id: 'ac01', short: 'EU', full: 'European Union' },
+  { id: 'ac02', short: 'UK', full: 'United Kingdom' },
+  { id: 'ac03', short: 'US', full: 'United States' },
+  { id: 'ac04', short: 'FOI', full: 'Freedom of Information' },
+  { id: 'ac05', short: 'FPTP', full: 'first-past-the-post' }
+];
 
+function runAcronymFirstMentionChecks(text) {
   const findings = [];
-  checks.forEach(c => {
-    const shortMatch = c.short.exec(text);
-    c.short.lastIndex = 0;
-    const fullMatch = c.full.exec(text);
+
+  ACRONYM_FIRST_MENTION_RULES.forEach(c => {
+    const shortRe = new RegExp(`\\b${c.short}\\b`, 'g');
+    const fullRe = new RegExp(c.full.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&'), 'i');
+
+    const shortMatch = shortRe.exec(text);
+    const fullMatch = fullRe.exec(text);
+
     if (shortMatch && (!fullMatch || shortMatch.index < fullMatch.index)) {
       findings.push({
         ruleId: c.id,
@@ -1455,11 +1458,12 @@ function runAcronymFirstMentionChecks(text) {
         confidence: 'medium',
         found: shortMatch[0],
         context: makeContext(text, shortMatch.index, shortMatch[0].length),
-        message: c.message,
+        message: `Spell out "${c.full}" on first mention, then ${c.short}`,
         index: shortMatch.index
       });
     }
   });
+
   return findings;
 }
 
@@ -1539,10 +1543,33 @@ function runAmericanSpellingChecks(text) {
   return findings;
 }
 
+const TYPO_DICTIONARY = [
+  'Thérèse','Coffey','antisemitism','antisemitic','policymaking','policymaker','taskforce','postmortem','Partygate','Crown Court','Supreme Court','Yemen','Zelensky'
+];
+
+const REQUIRED_DIACRITIC_FORMS = [];
+
 function runTypoChecks(text) {
-  const dictionary = ['Thérèse','Coffey','antisemitism','antisemitic','policymaking','policymaker','taskforce','postmortem','Partygate','Crown Court','Supreme Court'];
   const veryCommonShortWords = new Set(['these', 'those', 'there', 'three']);
   const findings = [];
+
+  REQUIRED_DIACRITIC_FORMS.forEach(entry => {
+    const re = new RegExp(`\\b${entry.raw}\\b`, 'g');
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      findings.push({
+        ruleId: entry.id,
+        category: 'Names',
+        severity: 'ERROR',
+        confidence: 'high',
+        found: m[0],
+        context: makeContext(text, m.index, m[0].length),
+        message: `Use "${entry.preferred}" (include accents)`,
+        index: m.index
+      });
+    }
+  });
+
   const tokenRe = /\b[A-Za-z][A-Za-z-]{3,}\b/g;
   let m;
   while ((m = tokenRe.exec(text)) !== null) {
@@ -1551,19 +1578,20 @@ function runTypoChecks(text) {
     const cand = normalizeTypoToken(token);
     if (!cand) continue;
     let best = null;
-    for (const word of dictionary) {
+
+    for (const word of TYPO_DICTIONARY) {
       const target = normalizeTypoToken(word);
       if (!target || !cand) continue;
       const dist = levenshtein(cand, target);
       const max = cand.length >= 8 ? 2 : 1;
-      const sameBaseSpellingDifferentDiacritics =
-        dist === 0 && token.toLowerCase() !== word.toLowerCase();
+      const sameBaseSpellingDifferentDiacritics = dist === 0 && token.toLowerCase() !== word.toLowerCase();
       const isProperNameEntry = /^[A-ZÀ-ÖØ-Þ]/.test(word);
       if (veryCommonShortWords.has(cand) && isProperNameEntry && dist <= max) continue;
       if ((dist > 0 && dist <= max) || sameBaseSpellingDifferentDiacritics) {
         if (!best || dist < best.dist) best = { word, dist };
       }
     }
+
     if (best) {
       findings.push({
         ruleId: 'ty01',
@@ -1577,10 +1605,163 @@ function runTypoChecks(text) {
       });
     }
   }
+
   return findings;
 }
 
-function runChecks(text) {
+
+function parseDocumentStructure(text) {
+  const lines = text.split(/\r?\n/);
+  const bulletRegex = /^\s*(?:[-*•]|\d+[.)])\s+/;
+  const blocks = [];
+  let current = null;
+
+  lines.forEach((line, i) => {
+    const isBullet = bulletRegex.test(line);
+    if (!isBullet) {
+      if (current) {
+        blocks.push(current);
+        current = null;
+      }
+      return;
+    }
+
+    if (!current) {
+      current = { startLine: i + 1, items: [], leadInLine: i > 0 ? lines[i - 1] : '' };
+    }
+
+    const textOnly = line.replace(bulletRegex, '').trim();
+    current.items.push({ line: i + 1, text: textOnly });
+  });
+
+  if (current) blocks.push(current);
+
+  return { lines, bulletBlocks: blocks };
+}
+
+function runStructureChecks(text) {
+  const parsed = parseDocumentStructure(text);
+  const findings = [];
+  let offset = 0;
+  const lineStart = parsed.lines.map(l => {
+    const start = offset;
+    offset += l.length + 1;
+    return start;
+  });
+
+  parsed.bulletBlocks.forEach(block => {
+    const leadIn = (block.leadInLine || '').trim();
+    if (!leadIn || /[.!?]$/.test(leadIn)) {
+      findings.push({
+        ruleId: 'sb01',
+        category: 'Structure',
+        severity: 'WARNING',
+        confidence: 'medium',
+        found: `bullet block at line ${block.startLine}`,
+        context: `line ${block.startLine}`,
+        message: 'Bullet lists should have a lead-in line that runs into the bullets',
+        index: lineStart[block.startLine - 1] || 0
+      });
+    }
+
+    block.items.forEach(item => {
+      const sentenceCount = (item.text.match(/[.!?](?:\s|$)/g) || []).length;
+      if (sentenceCount > 1) {
+        findings.push({
+          ruleId: 'sb02',
+          category: 'Structure',
+          severity: 'WARNING',
+          confidence: 'medium',
+          found: item.text,
+          context: `line ${item.line}`,
+          message: 'Use no more than one sentence per bullet point',
+          index: lineStart[item.line - 1] || 0
+        });
+      }
+      if (/;\s*$/.test(item.text)) {
+        findings.push({
+          ruleId: 'sb03',
+          category: 'Structure',
+          severity: 'ERROR',
+          confidence: 'high',
+          found: item.text,
+          context: `line ${item.line}`,
+          message: 'Do not end bullet points with a semicolon',
+          index: lineStart[item.line - 1] || 0
+        });
+      }
+      if (/\.\s*$/.test(item.text)) {
+        findings.push({
+          ruleId: 'sb04',
+          category: 'Structure',
+          severity: 'WARNING',
+          confidence: 'medium',
+          found: item.text,
+          context: `line ${item.line}`,
+          message: 'Do not end the last bullet with a full stop',
+          index: lineStart[item.line - 1] || 0
+        });
+      }
+    });
+  });
+
+  return findings;
+}
+
+function runContextualStyleChecks(text) {
+  const findings = [];
+  const legalWindow = /(court|judge|judicial|tribunal|ruling|legal|law|appeal|sentence)/i;
+
+  const judgementRe = /\bjudgement\b/gi;
+  let m;
+  while ((m = judgementRe.exec(text)) !== null) {
+    const scope = text.slice(Math.max(0, m.index - 80), Math.min(text.length, m.index + 80));
+    if (legalWindow.test(scope)) {
+      findings.push({
+        ruleId: 'cx01',
+        category: 'Word Choice',
+        severity: 'WARNING',
+        confidence: 'medium',
+        found: m[0],
+        context: makeContext(text, m.index, m[0].length),
+        message: 'In legal contexts, prefer "judgment"',
+        index: m.index
+      });
+    }
+  }
+
+  const impactRe = /\b(?:could|might|may|will|would)\s+impact\b|\bimpact on\b/gi;
+  while ((m = impactRe.exec(text)) !== null) {
+    findings.push({
+      ruleId: 'cx02',
+      category: 'Word Choice',
+      severity: 'WARNING',
+      confidence: 'medium',
+      found: m[0],
+      context: makeContext(text, m.index, m[0].length),
+      message: 'Consider "affect"/"have an effect on" instead of "impact" where clearer',
+      index: m.index
+    });
+  }
+
+  const rollRe = /\brollout\b|\broll out\b/gi;
+  while ((m = rollRe.exec(text)) !== null) {
+    findings.push({
+      ruleId: 'cx03',
+      category: 'Hyphenation',
+      severity: 'INFO',
+      confidence: 'medium',
+      found: m[0],
+      context: makeContext(text, m.index, m[0].length),
+      message: 'Check form by grammar: verb = "roll out", noun = "rollout"',
+      index: m.index
+    });
+  }
+
+  return findings;
+}
+
+function runChecks(text, options = {}) {
   const findings = [];
   const seenMatches = new Set();
 
@@ -1615,7 +1796,9 @@ function runChecks(text) {
     ...runGrammarChecks(text),
     ...runAcronymFirstMentionChecks(text),
     ...runTypoChecks(text),
-    ...runAmericanSpellingChecks(text)
+    ...runAmericanSpellingChecks(text),
+    ...runContextualStyleChecks(text),
+    ...(options.enableStructureChecks === false ? [] : runStructureChecks(text))
   ];
 
   extra.forEach(item => {

@@ -38,10 +38,18 @@ vm.runInContext(js, sandbox);
 const fixtures = JSON.parse(fs.readFileSync('tests/rules-fixtures.json', 'utf8'));
 let failed = 0;
 
+const coverage = {
+  fixtures: fixtures.length,
+  seenRuleIds: new Set(),
+  seenCategories: new Set()
+};
+
+
 for (const fx of fixtures) {
   let fixtureFailed = 0;
   const findings = sandbox.runChecks(fx.text);
   const ids = new Set(findings.map(f => f.ruleId));
+  findings.forEach((f) => { coverage.seenRuleIds.add(f.ruleId); coverage.seenCategories.add(f.category); });
 
   const countsByRule = findings.reduce((acc, finding) => {
     acc[finding.ruleId] = (acc[finding.ruleId] || 0) + 1;
@@ -80,3 +88,4 @@ for (const fx of fixtures) {
 
 if (failed) process.exit(1);
 console.log('Fixture checks passed.');
+console.log(`Coverage summary: ${coverage.fixtures} fixtures, ${coverage.seenRuleIds.size} triggered rule IDs, categories: ${[...coverage.seenCategories].sort().join(', ')}`);
