@@ -1349,7 +1349,6 @@ const SUPPLEMENTAL_RULES = [
   { id:'sx09', category:'Capitalisation', severity:'ERROR', find:/\bthe king\b/g, message:'Use "the King" when referring to Charles III' },
   { id:'sx10', category:'Capitalisation', severity:'ERROR', find:/\b(?!House of Commons Library\b)[Hh]ouse of [Cc]ommons [Ll]ibrary\b/g, message:'Use "House of Commons Library"' },
   { id:'sx11', category:'Capitalisation', severity:'ERROR', find:/\b(?!Crown Court\b)[Cc]rown [Cc]ourt\b/g, message:'Use "Crown Court" (upper case)' },
-  { id:'sx12', category:'Capitalisation', severity:'ERROR', find:/\b(?!Supreme Court\b)[Ss]upreme [Cc]ourt\b/g, message:'Use "Supreme Court" (upper case)' },
   { id:'sx13', category:'Capitalisation', severity:'ERROR', find:/\b(?!Autumn Statement\b)[Aa]utumn [Ss]tatement\b/g, message:'Use "Autumn Statement" (upper case)' },
   { id:'sx14', category:'Capitalisation', severity:'ERROR', find:/\b(?!Spring Statement\b)[Ss]pring [Ss]tatement\b/g, message:'Use "Spring Statement" (upper case)' },
   { id:'sx16', category:'Hyphenation', severity:'ERROR', find:/\bunderway\b/gi, message:'Use "under way" (two words)' },
@@ -1361,7 +1360,21 @@ const SUPPLEMENTAL_RULES = [
   { id:'sx27', category:'Word Choice', severity:'ERROR', find:/\bjuvenile courts\b/gi, message:'Use "youth courts"' },
   { id:'sx28', category:'Word Choice', severity:'ERROR', find:/\bthe Yemen\b/g, message:'Use "Yemen" not "the Yemen"' },
   { id:'sx29', category:'Word Choice', severity:'ERROR', find:/\bwelsh office\b/gi, message:'Use "Wales Office" not "Welsh Office"' },
-  { id:'sx30', category:'Word Choice', severity:'ERROR', find:/\bscottish office\b/gi, message:'Use "Scotland Office" not "Scottish Office"' }
+  { id:'sx30', category:'Word Choice', severity:'ERROR', find:/\bscottish office\b/gi, message:'Use "Scotland Office" not "Scottish Office"' },
+  { id:'sx31', category:'Spelling', severity:'ERROR', find:/\bdisorientated\b/gi, message:'Use "disorientate" not "disorientated"' },
+  { id:'sx32', category:'Hyphenation', severity:'ERROR', find:/\bcooperation\b|\bcooperate\b|\bcoordinate\b|\bcoproducer\b/gi, message:'Use hyphenated forms: "co-operation", "co-operate", "co-ordinate", "co-producer"' },
+  { id:'sx33', category:'Hyphenation', severity:'ERROR', find:/\breelection\b|\breemerge\b|\breexamine\b/gi, message:'Use hyphenated forms: "re-election", "re-emerge", "re-examine"' },
+  { id:'sx34', category:'Hyphenation', severity:'ERROR', find:/\bcyber risk\b|\bcyber resilience\b|\bcyber attack\b|\bcyber hack\b|\bcyber army\b/gi, message:'Use hyphenated forms such as "cyber-risk", "cyber-resilience", "cyber-attack", "cyber-hack", "cyber-army"' },
+  { id:'sx35', category:'Hyphenation', severity:'WARNING', find:/\bshort term\s+(plan|fix|measure|solution|strategy|policy|deal|target|approach|goal|contract|loan|impact|effect|objective|support|measure)\b/gi, message:'Use "short-term" when it is a compound adjective before a noun' },
+  { id:'sx36', category:'Capitalisation', severity:'ERROR', find:/\bthe hague\b/g, message:'Use "The Hague" (capitalise "The")' },
+  { id:'sx37', category:'Capitalisation', severity:'ERROR', find:/\brt hon\b/gi, message:'Use "Rt Hon" (capital R and H)' },
+  { id:'sx38', category:'Numbers', severity:'WARNING', find:/£\s?\d+(?:\.\d+)?\s?(million|billion|trillion)\b/gi, message:'With currency values, use abbreviations like "£50m", "£50bn", "£2tn"' },
+  { id:'sx39', category:'Numbers', severity:'WARNING', find:/\b\d+\s?(bn|m|tn)\s+(people|person|residents?|citizens?|animals?|households?)\b/gi, message:'For people or animals, spell out "million"/"billion" instead of abbreviations' },
+  { id:'sx40', category:'Numbers', severity:'ERROR', find:/\b\d+°\s?C\b/g, message:'Use temperature style without degree symbol: "30C" not "30°C"' },
+  { id:'sx41', category:'Proper Nouns', severity:'ERROR', find:/\bSinn Fein\b/g, message:'Use "Sinn Féin" (include accent)' },
+  { id:'sx42', category:'Proper Nouns', severity:'ERROR', find:/\bHong Kongers\b/gi, message:'Use "Hongkongers" (one word)' },
+  { id:'sx43', category:'Formatting', severity:'ERROR', find:/\bNo\.\s?(10|11)\b/g, message:'Use "No 10" / "No 11" (no full stop)' },
+  { id:'sx44', category:'Word Choice', severity:'INFO', find:/\balternatives\b/gi, message:'Check context: use "choice" rather than "alternative" when referring to three or more options' }
 ];
 
 RULES.push(...SUPPLEMENTAL_RULES);
