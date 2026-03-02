@@ -788,6 +788,9 @@ const RULES = [
   { id:'c34', category:'Capitalisation', severity:'WARNING',
     find: /\bthe (?:duke|duchess|earl|lord|baron|baroness) of\b/gi,
     message: 'Check capitalisation: "the Duke of X" on first mention is upper case; but "the duke" on subsequent mentions is lower case' },
+  { id:'c35', category:'Capitalisation', severity:'ERROR',
+    find: /\bGovernment\b/g,
+    message: 'Use "government" in lowercase (e.g. "the UK government", "the government") unless an explicit style-guide exception applies' },
   { id:'c20', category:'Capitalisation', severity:'WARNING',
     find: /\binternet\b/gi,
     message: 'Check: "internet" is now standard lowercase' },
@@ -1392,9 +1395,28 @@ const RULE_CONFIDENCE = {
   c22: 'medium', c23: 'medium', c24: 'medium', c25: 'medium'
 };
 
+function isGovernmentUppercaseException(text, index) {
+  const exceptionPhrases = [
+    'Ministry of Housing, Communities and Local Government',
+    'Local Government Association',
+    'Local Government and Elections Bill'
+  ];
+
+  return exceptionPhrases.some((phrase) => {
+    let phraseIndex = text.indexOf(phrase);
+    while (phraseIndex !== -1) {
+      const governmentIndex = phraseIndex + phrase.indexOf('Government');
+      if (governmentIndex === index) return true;
+      phraseIndex = text.indexOf(phrase, phraseIndex + 1);
+    }
+    return false;
+  });
+}
+
 const RULE_GUARDS = {
   sx01: (match, text) => !isInsideDoubleQuotes(text, match.index),
-  s39: (match, text) => !isSoftwareContext(text, match.index)
+  s39: (match, text) => !isSoftwareContext(text, match.index),
+  c35: (match, text) => !isGovernmentUppercaseException(text, match.index)
 };
 
 function getConfidence(ruleId, severity) {

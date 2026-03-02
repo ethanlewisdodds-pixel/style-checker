@@ -193,5 +193,24 @@
       "sx13",
       "sx14"
     ]
+  },
+  {
+    "name": "government should be lowercase",
+    "text": "The UK Government said the Scottish Government and Welsh Government would meet the French Government. Later, the Government confirmed it.",
+    "expectPresent": [
+      "c35"
+    ],
+    "expectAbsent": [],
+    "expectCountByRule": {
+      "c35": 5
+    }
+  },
+  {
+    "name": "government uppercase exceptions allowed",
+    "text": "The Ministry of Housing, Communities and Local Government worked with the Local Government Association on the Local Government and Elections Bill.",
+    "expectPresent": [],
+    "expectAbsent": [
+      "c35"
+    ]
   }
 ]
