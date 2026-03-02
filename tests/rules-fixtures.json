@@ -2,74 +2,124 @@
   {
     "name": "core style catches",
     "text": "Therese Coffey met Zelenskyy at 10:30pm in the crown court and proposed a task force post mortem in the Yemen.",
-    "expectPresent": ["s35", "s34", "p03", "sx11", "h12", "h20", "m08"],
+    "expectPresent": [
+      "s35",
+      "s34",
+      "p03",
+      "sx11",
+      "h12",
+      "h20",
+      "m08"
+    ],
     "expectAbsent": []
   },
   {
     "name": "program in software context should not fire",
     "text": "The software program runs nightly on a Python script.",
     "expectPresent": [],
-    "expectAbsent": ["s39"]
+    "expectAbsent": [
+      "s39"
+    ]
   },
   {
     "name": "acronym warning when short form comes first",
     "text": "The EU announced changes today.",
-    "expectPresent": ["ac01"],
+    "expectPresent": [
+      "ac01"
+    ],
     "expectAbsent": []
   },
   {
     "name": "no acronym warning when full form comes first",
     "text": "The European Union announced changes today. The EU responded.",
     "expectPresent": [],
-    "expectAbsent": ["ac01"]
+    "expectAbsent": [
+      "ac01"
+    ]
   },
   {
     "name": "no duplicate acronym warning for repeated short form",
     "text": "The EU announced changes today. EU officials responded.",
-    "expectPresent": ["ac01"],
+    "expectPresent": [
+      "ac01"
+    ],
     "expectAbsent": [],
-    "expectCountByRule": { "ac01": 1 }
+    "expectCountByRule": {
+      "ac01": 1
+    }
   },
   {
     "name": "american spelling suggestions",
     "text": "The Color Center honored a favorite labor organizer.",
-    "expectPresent": ["am01"],
+    "expectPresent": [
+      "am01"
+    ],
     "expectAbsent": []
   },
   {
     "name": "frontbench should be flagged",
     "text": "A senior frontbench MP briefed journalists.",
-    "expectPresent": ["h07"],
+    "expectPresent": [
+      "h07"
+    ],
     "expectAbsent": []
   },
   {
     "name": "front bench should not be flagged",
     "text": "A senior front bench MP briefed journalists.",
     "expectPresent": [],
-    "expectAbsent": ["h07"]
+    "expectAbsent": [
+      "h07"
+    ]
   },
   {
     "name": "structure checks semicolon and full stop",
     "text": "Please note\n- first bullet;\n- second bullet.",
-    "expectPresent": ["sb03", "sb04"],
+    "expectPresent": [
+      "sb03",
+      "sb04"
+    ],
     "expectAbsent": []
   },
   {
     "name": "impact contextual guidance",
     "text": "The policy might impact families and have an impact on schools.",
-    "expectPresent": ["cx02"],
+    "expectPresent": [
+      "cx02"
+    ],
     "expectAbsent": []
   },
   {
     "name": "legal judgement contextual guidance",
     "text": "The court judgment noted that the prior judgement was unclear.",
-    "expectPresent": ["cx01", "s26"],
+    "expectPresent": [
+      "cx01",
+      "s26"
+    ],
     "expectAbsent": []
   },
   {
     "name": "acronym FOI first mention",
     "text": "An FOI request was submitted yesterday.",
-    "expectPresent": ["ac04"],
+    "expectPresent": [
+      "ac04"
+    ],
     "expectAbsent": []
+  },
+  {
+    "name": "government uppercase should be flagged",
+    "text": "The Government announced the policy yesterday.",
+    "expectPresent": [
+      "c35"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "government lowercase should be accepted",
+    "text": "The government announced the policy yesterday.",
+    "expectPresent": [],
+    "expectAbsent": [
+      "c35"
+    ]
   }
 ]
