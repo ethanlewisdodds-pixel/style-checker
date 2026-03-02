@@ -33,7 +33,7 @@
     "name": "american spelling suggestions",
     "text": "The Color Center honored a favorite labor organizer.",
     "expectPresent": [
-      "sx29"
+      "am01"
     ],
     "expectAbsent": []
   }
