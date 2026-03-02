@@ -204,5 +204,13 @@
     "expectCountByRule": {
       "c35": 5
     }
+  },
+  {
+    "name": "government exceptions remain uppercase in approved phrases",
+    "text": "The Ministry of Housing, Communities and Local Government met the Local Government Association to discuss the Local Government and Elections Bill.",
+    "expectPresent": [],
+    "expectAbsent": [
+      "c35"
+    ]
   }
 ]
