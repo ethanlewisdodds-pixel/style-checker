@@ -212,5 +212,16 @@
     "expectAbsent": [
       "c35"
     ]
+  },
+  {
+    "name": "standalone single-digit numbers should be spelled out",
+    "text": "He bought 3 apples and 9 oranges.",
+    "expectPresent": [
+      "n07"
+    ],
+    "expectAbsent": [],
+    "expectCountByRule": {
+      "n07": 2
+    }
   }
 ]
