@@ -685,6 +685,9 @@ const RULES = [
   { id:'n06', category:'Numbers', severity:'ERROR',
     find: /the (\d{4})s'/g,
     message: 'Decades: use "the 1960s" not "the 1960s\'" (no apostrophe before s)' },
+  { id:'n07', category:'Numbers', severity:'WARNING',
+    find: /\b[1-9]\b/g,
+    message: 'Spell out standalone numbers from one to nine (eg "three" not "3")' },
 
   // ── CAPITALISATION ─────────────────────────────────────────
 
