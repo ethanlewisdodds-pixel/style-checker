@@ -1363,6 +1363,7 @@ const SUPPLEMENTAL_RULES = [
 ];
 
 RULES.push(...SUPPLEMENTAL_RULES);
+const STATIC_RULE_IDS = new Set(RULES.map(rule => rule.id));
 
 // ─────────────────────────────────────────────────────────────
 // CHECKER ENGINE
@@ -1525,7 +1526,7 @@ function runAmericanSpellingChecks(text) {
     if (!british) continue;
 
     findings.push({
-      ruleId: 'sx29',
+      ruleId: 'am01',
       category: 'Spelling',
       severity: 'ERROR',
       confidence: 'high',
@@ -1619,6 +1620,10 @@ function runChecks(text) {
   ];
 
   extra.forEach(item => {
+    if (STATIC_RULE_IDS.has(item.ruleId)) {
+      throw new Error(`Dynamic finding rule ID collides with static rule ID: ${item.ruleId}`);
+    }
+
     const key = `${item.ruleId}::${item.found.toLowerCase()}::${item.index}`;
     if (!seenMatches.has(key)) {
       seenMatches.add(key);
