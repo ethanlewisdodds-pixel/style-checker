@@ -58,7 +58,7 @@
   },
   {
     "name": "frontbench should be flagged",
-    "text": "A senior frontbench MP briefed journalists.",
+    "text": "A senior front bench MP briefed journalists.",
     "expectPresent": [
       "h07"
     ],
@@ -66,7 +66,7 @@
   },
   {
     "name": "front bench should not be flagged",
-    "text": "A senior front bench MP briefed journalists.",
+    "text": "A senior frontbench MP briefed journalists.",
     "expectPresent": [],
     "expectAbsent": [
       "h07"
@@ -223,5 +223,170 @@
     "expectCountByRule": {
       "n07": 2
     }
+  },
+  {
+    "name": "pope uppercase only flagged",
+    "text": "The Pope met Pope Francis and the pope spoke.",
+    "expectPresent": [
+      "c32"
+    ],
+    "expectAbsent": [],
+    "expectCountByRule": {
+      "c32": 1
+    }
+  },
+  {
+    "name": "frontbench one word and front benches two words",
+    "text": "The frontbench team met MPs on the front benches.",
+    "expectPresent": [],
+    "expectAbsent": [
+      "h07"
+    ]
+  },
+  {
+    "name": "back benchers flagged",
+    "text": "Several Back Benchers criticised the plan.",
+    "expectPresent": [
+      "h06"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "fractions numeric notation flagged",
+    "text": "The vote split was 1/2 to 1/3 and 3/4 in tests.",
+    "expectPresent": [
+      "n08"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "large person counts numeral flagged",
+    "text": "The study covered 14,000,000 people and 2,000,000 dogs.",
+    "expectPresent": [
+      "n09"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "ordinal and month comma dates flagged",
+    "text": "On 1st March, 2021 and March, 2021 we met.",
+    "expectPresent": [
+      "p05b",
+      "p05c"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "apostrophe year and date range flagged",
+    "text": "In '97, from 10 November-21 December and November/December events rose.",
+    "expectPresent": [
+      "p11",
+      "p11b",
+      "p11c"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "temperature styles flagged",
+    "text": "It reached 30\u00b0C and later 30 degrees celsius.",
+    "expectPresent": [
+      "n10"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "tick-box and short-term adjective rules",
+    "text": "A tick box exercise and a short term plan were noted in the short term.",
+    "expectPresent": [
+      "h47",
+      "h48"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "under prefix dehyphenation and co forms",
+    "text": "They under-mine results and co ordinated work to co operate with a coproducer.",
+    "expectPresent": [
+      "h49",
+      "h29"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "cyber attack hyphenation",
+    "text": "A cyber attack and cyber risk assessment was published.",
+    "expectPresent": [
+      "h50"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "proper noun corrections",
+    "text": "Ghandi met Volodymyr Zelenskyy and Volodymr Zelensky.",
+    "expectPresent": [
+      "s38",
+      "s34"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "fill out context",
+    "text": "Please fill out this questionnaire and fill out a form.",
+    "expectPresent": [
+      "s11"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "global ize rule",
+    "text": "They polarize and finalize, then analyze and recognize patterns.",
+    "expectPresent": [
+      "sx46"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "named bill lowercase review",
+    "text": "Parliament debated online safety bill and climate reform bill.",
+    "expectPresent": [
+      "sx45"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "assembly and windsor framework casing",
+    "text": "The Northern Ireland Assembly endorsed the Windsor Framework.",
+    "expectPresent": [
+      "c36",
+      "c37"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "department acronym casing",
+    "text": "DFE and DFT met with DfE and DfT.",
+    "expectPresent": [
+      "a13",
+      "a15"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "bullet lowercase semicolon final stop checks",
+    "text": "Lead in line\n- First bullet;\n- second bullet.",
+    "expectPresent": [
+      "sb03",
+      "sb04",
+      "sb05"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "al-qaeda correct form not flagged",
+    "text": "The group al-Qaeda issued a statement.",
+    "expectPresent": [],
+    "expectAbsent": [
+      "st02"
+    ]
   }
 ]
