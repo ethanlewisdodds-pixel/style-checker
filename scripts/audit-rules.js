@@ -12,12 +12,10 @@ function extractCheckerScript(html) {
 }
 
 const KNOWN_DUP_REGEX = new Set([
-  '\\bjudgement\\b__gi',
   '\\bsupreme court\\b__gi'
 ]);
 
 const KNOWN_DUP_MESSAGE = new Set([
-  'Use "Yemen" not "the Yemen"',
   'Use "A-level" (upper case A, lower case l)',
   'Use "O-level" (upper case O, lower case l)',
   'Use "Supreme Court" (upper case)'

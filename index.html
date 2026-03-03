@@ -551,9 +551,6 @@ const RULES = [
   { id:'s25', category:'Spelling', severity:'WARNING',
     find: /\bimposter\b/gi,
     message: 'Use "impostor" not "imposter"' },
-  { id:'s26', category:'Spelling', severity:'INFO',
-    find: /\bjudgement\b/gi,
-    message: 'Legal usage normally prefers "judgment"; non-legal usage can be "judgement"' },
   { id:'s27', category:'Spelling', severity:'ERROR',
     find: /\bfillibuster\b/gi,
     message: 'Use "filibuster" not "fillibuster"',
@@ -732,9 +729,9 @@ const RULES = [
   { id:'n06', category:'Numbers', severity:'ERROR',
     find: /the (\d{4})s'/g,
     message: 'Decades: use "the 1960s" not "the 1960s\'" (no apostrophe before s)' },
-  { id:'n07', category:'Numbers', severity:'WARNING',
+  { id:'n07', category:'Numbers', severity:'INFO',
     find: /\b[1-9]\b/g,
-    message: 'Spell out standalone numbers from one to nine (eg "three" not "3")' },
+    message: 'Consider spelling out numbers one to nine in prose (eg "three" not "3") — ignore labels and identifiers' },
   { id:'n08', category:'Numbers', severity:'ERROR',
     find: /\b(?:1\/2|1\/3|2\/3|1\/4|3\/4)\b/g,
     message: 'Write common fractions in words (eg "one-half", "two-thirds") rather than numeric notation' },
@@ -835,9 +832,9 @@ const RULES = [
   { id:'c30', category:'Capitalisation', severity:'WARNING',
     find: /\bgovernor of the bank of england\b/gi,
     message: 'Keep "governor of the Bank of England" lowercase — this is not a Cabinet title' },
-  { id:'c31', category:'Capitalisation', severity:'ERROR',
-    find: /\bBank of England\b/g,
-    message: 'Check: "Bank of England" should be upper case — but "governor of the Bank of England" stays lowercase' },
+  { id:'c31', category:'Capitalisation', severity:'WARNING',
+    find: /\bbank of england\b/g,
+    message: 'Use "Bank of England" (upper case) — note: "governor of the Bank of England" stays lowercase' },
   { id:'c32', category:'Capitalisation', severity:'WARNING',
     find: /\b[Tt]he Pope\b/g,
     message: 'Use "the pope" (lowercase), but "Pope Francis" when used as a title before a name' },
@@ -940,6 +937,9 @@ const RULES = [
   { id:'h26', category:'Hyphenation', severity:'ERROR',
     find: /\be-book\b/gi,
     message: 'Use "ebook" (one word, no hyphen)' },
+  { id:'new04', category:'Hyphenation', severity:'ERROR',
+    find: /\belearning\b|\becommerce\b|\bereader\b|\bepetition\b/gi,
+    message: 'Keep hyphens: "e-learning", "e-commerce", "e-reader", "e-petition"' },
   { id:'h27', category:'Hyphenation', severity:'ERROR',
     find: /\bWi-Fi\b|\bWiFi\b|\bwifi\b/g,
     message: 'Use "wi-fi" (lowercase, hyphenated)' },
@@ -983,8 +983,11 @@ const RULES = [
     find: /\bhigh vis\b/gi,
     message: 'Use "hi-vis" (with hyphen, and "hi" not "high")' },
   { id:'h41', category:'Hyphenation', severity:'ERROR',
-    find: /\bmulti-disciplinary\b|\bmultidisciplinary\b/gi,
+    find: /\bmulti-disciplinary\b/gi,
     message: 'Use "multidisciplinary" (one word)' },
+  { id:'new01', category:'Hyphenation', severity:'ERROR',
+    find: /\bLying in State\b/g,
+    message: 'Use "Lying-in-State" (hyphenated)' },
   { id:'h42', category:'Hyphenation', severity:'ERROR',
     find: /\bhead teacher\b|\bhead-teacher\b/gi,
     message: 'Use "headteacher" (one word)' },
@@ -1123,9 +1126,6 @@ const RULES = [
   { id:'m07', category:'Spelling', severity:'ERROR',
     find: /\bmoney.grabbing\b/gi,
     message: 'Use "money grubbing" not "money grabbing"' },
-  { id:'m08', category:'Spelling', severity:'ERROR',
-    find: /\bthe Yemen\b/gi,
-    message: 'Use "Yemen" not "the Yemen"' },
   { id:'m09', category:'Spelling', severity:'ERROR',
     find: /\byoghurt\b/gi,
     message: 'Use "yogurt" not "yoghurt" (per style guide)' },
@@ -1243,9 +1243,6 @@ const RULES = [
   { id:'x10', category:'Spelling', severity:'INFO',
     find: /\bjudgement\b/gi,
     message: 'Check: use "judgment" for legal contexts; "judgement" in all other cases' },
-  { id:'x11', category:'Spelling', severity:'ERROR',
-    find: /\bjudgment\b/gi,
-    message: 'Check: use "judgment" only for legal contexts; "judgement" in all other cases' },
   { id:'x12', category:'Spelling', severity:'ERROR',
     find: /\bsergeant at arms\b|\bSergeant at Arms\b/gi,
     message: 'Use "serjeant at arms" (not sergeant)' },
@@ -1307,7 +1304,7 @@ const RULES = [
     find: /\bderisking\b|\bde risking\b/gi,
     message: 'Use "de-risking" (hyphenated)' },
   { id:'x30', category:'Hyphenation', severity:'ERROR',
-    find: /\bfilm-goer\b|\bfilmgoer\b/gi,
+    find: /\bfilm-goer\b/gi,
     message: 'Use "filmgoer" (one word)' },
 
   // ── FINAL BATCH: REMAINING STYLE GUIDE RULES ─────────────
@@ -1325,17 +1322,14 @@ const RULES = [
     find: /\bdespatched\b/gi,
     message: 'Use "dispatched" not "despatched"' },
   { id:'z05', category:'Spelling', severity:'ERROR',
-    find: /\bdespatch\b/gi,
-    message: 'Use "dispatch" not "despatch" (except "despatch box" in Commons context)' },
+    find: /\bdespatch\b(?!\s+box)/gi,
+    message: 'Use "dispatch" not "despatch" (exception: "despatch box" in Commons context is acceptable)' },
   { id:'z06', category:'Spelling', severity:'ERROR',
     find: /\blikeable\b/gi,
     message: 'Use "likable" not "likeable"' },
   { id:'z07', category:'Spelling', severity:'ERROR',
     find: /\bloveable\b/gi,
     message: 'Use "lovable" not "loveable"' },
-  { id:'z08', category:'Spelling', severity:'ERROR',
-    find: /\bchangeable\b/gi,
-    message: 'Check spelling: "changeable" (this is correct — just confirming)' },
   { id:'z09', category:'Spelling', severity:'ERROR',
     find: /\bjoky\b/gi,
     message: 'Use "jokey" not "joky"' },
@@ -1397,8 +1391,14 @@ const RULES = [
     find: /\b(?!Boat Race\b)[Bb]oat [Rr]ace\b/g,
     message: 'Use "Boat Race" (upper case)' },
   { id:'z28', category:'Capitalisation', severity:'ERROR',
-    find: /\b(?!Deepfake\b)[Dd]eepfake\b/g,
-    message: 'Use "Deepfake" (upper case D)' },
+    find: /\b(?!Deepfakes?\b)[Dd]eepfakes?\b/g,
+    message: 'Use "Deepfake" / "Deepfakes" (upper case D)' },
+  { id:'new02', category:'Capitalisation', severity:'ERROR',
+    find: /\bHomes For Ukraine\b/g,
+    message: 'Use "Homes for Ukraine" — "for" should be lowercase' },
+  { id:'new03', category:'Capitalisation', severity:'WARNING',
+    find: /\bBig Tech\b/g,
+    message: 'Use "big tech" (all lowercase)' },
   { id:'z29', category:'Capitalisation', severity:'ERROR',
     find: /\b(?!Zeitgeist\b)[Zz]eitgeist\b/g,
     message: 'Use "Zeitgeist" (upper case Z)' },
@@ -1462,7 +1462,6 @@ const SUPPLEMENTAL_RULES = [
   { id:'sx28', category:'Word Choice', severity:'ERROR', find:/\bthe Yemen\b/g, message:'Use "Yemen" not "the Yemen"' },
   { id:'sx29', category:'Word Choice', severity:'ERROR', find:/\bwelsh office\b/gi, message:'Use "Wales Office" not "Welsh Office"' },
   { id:'sx30', category:'Word Choice', severity:'ERROR', find:/\bscottish office\b/gi, message:'Use "Scotland Office" not "Scottish Office"' },
-  { id:'sx31', category:'Spelling', severity:'ERROR', find:/\bdisorientated\b/gi, message:'Use "disorientate" not "disorientated"' },
   { id:'sx32', category:'Hyphenation', severity:'ERROR', find:/\bcooperation\b|\bcooperate\b|\bcoordinate\b|\bcoproducer\b/gi, message:'Use hyphenated forms: "co-operation", "co-operate", "co-ordinate", "co-producer"' },
   { id:'sx33', category:'Hyphenation', severity:'ERROR', find:/\breelection\b|\breemerge\b|\breexamine\b/gi, message:'Use hyphenated forms: "re-election", "re-emerge", "re-examine"' },
   { id:'sx34', category:'Hyphenation', severity:'ERROR', find:/\bcyber risk\b|\bcyber resilience\b|\bcyber attack\b|\bcyber hack\b|\bcyber army\b/gi, message:'Use hyphenated forms such as "cyber-risk", "cyber-resilience", "cyber-attack", "cyber-hack", "cyber-army"' },
@@ -1496,10 +1495,15 @@ function makeContext(text, index, foundLen) {
   return context;
 }
 
-function isInsideDoubleQuotes(text, index) {
+function isInsideQuotes(text, index, quoteChar) {
   const prior = text.slice(0, index);
-  const count = (prior.match(/"/g) || []).length;
+  const escaped = quoteChar.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const count = (prior.match(new RegExp(`(?<!\\\\)${escaped}`, 'g')) || []).length;
   return count % 2 === 1;
+}
+
+function isInsideAnyQuotes(text, index) {
+  return isInsideQuotes(text, index, '"') || isInsideQuotes(text, index, "'");
 }
 
 function isSoftwareContext(text, index) {
@@ -1514,7 +1518,7 @@ const RULE_CONFIDENCE = {
 };
 
 const RULE_GUARDS = {
-  sx01: (match, text) => !isInsideDoubleQuotes(text, match.index),
+  sx01: (match, text) => !isInsideAnyQuotes(text, match.index),
   s39: (match, text) => !isSoftwareContext(text, match.index)
 };
 

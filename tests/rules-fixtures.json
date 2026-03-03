@@ -9,7 +9,7 @@
       "sx11",
       "h12",
       "h20",
-      "m08"
+      "sx28"
     ],
     "expectAbsent": []
   },
@@ -93,8 +93,7 @@
     "name": "legal judgement contextual guidance",
     "text": "The court judgment noted that the prior judgement was unclear.",
     "expectPresent": [
-      "cx01",
-      "s26"
+      "cx01"
     ],
     "expectAbsent": []
   },
@@ -388,5 +387,69 @@
     "expectAbsent": [
       "st02"
     ]
+  },
+  {
+    "name": "despatch box exception should not fire",
+    "text": "The despatch box was empty.",
+    "expectPresent": [],
+    "expectAbsent": [
+      "z05"
+    ]
+  },
+  {
+    "name": "multidisciplinary should not fire",
+    "text": "A multidisciplinary team reviewed the case.",
+    "expectPresent": [],
+    "expectAbsent": [
+      "h41"
+    ]
+  },
+  {
+    "name": "disorientated should not fire",
+    "text": "She was disorientated after the incident.",
+    "expectPresent": [],
+    "expectAbsent": [
+      "sx31"
+    ]
+  },
+  {
+    "name": "bank of england canonical casing should not fire",
+    "text": "The Bank of England raised rates.",
+    "expectPresent": [],
+    "expectAbsent": [
+      "c31"
+    ]
+  },
+  {
+    "name": "bank of england lowercase should fire",
+    "text": "the bank of england raised rates.",
+    "expectPresent": [
+      "c31"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "deepfakes lowercase plural should fire",
+    "text": "Deepfakes are a growing concern and deepfakes can spread quickly.",
+    "expectPresent": [
+      "z28"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "homes for ukraine title casing",
+    "text": "The Homes For Ukraine scheme was expanded.",
+    "expectPresent": [
+      "new02"
+    ],
+    "expectAbsent": []
+  },
+  {
+    "name": "sinn fein accent catch",
+    "text": "Sinn Fein leaders responded.",
+    "expectPresent": [
+      "sx41"
+    ],
+    "expectAbsent": []
   }
 ]
