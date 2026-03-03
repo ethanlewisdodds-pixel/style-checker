@@ -210,9 +210,6 @@
   .issue-main { display: grid; gap: 8px; }
   .issue-meta-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
   .issue-compare {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
     margin-top: 2px;
   }
   .issue-compare-col {
@@ -237,7 +234,6 @@
     color: var(--ink);
     word-break: break-word;
   }
-  .issue-compare-col.suggested .issue-snippet { color: var(--success); }
   .issue-context {
     font-size: 12px; color: var(--mid); margin-top: 4px;
     font-style: italic; line-height: 1.4;
@@ -2210,10 +2206,6 @@ function renderResults() {
                 <div class="issue-compare-col found">
                   <span class="issue-compare-label">Found</span>
                   <div class="issue-snippet">"${escHtml(item.found)}"</div>
-                </div>
-                <div class="issue-compare-col suggested">
-                  <span class="issue-compare-label">Suggested</span>
-                  <div class="issue-snippet">${item.suggestedFix ? `"${escHtml(item.suggestedFix)}"` : 'No direct replacement. Use message guidance.'}</div>
                 </div>
               </div>
               <p class="issue-context">${ctx}</p>
