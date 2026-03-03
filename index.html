@@ -836,29 +836,29 @@ const RULES = [
     message: 'Check: "parliament" should be lowercase when referring to a session (e.g. "this parliament", "the next parliament") — only uppercase for the building or institution' },
 
   { id:'c22', category:'Capitalisation', severity:'WARNING',
-    find: /\bthe prime minister\b/gi,
-    message: 'Check capitalisation: "Prime Minister" is upper case when referring to the current incumbent; lower case when speaking generally' },
+    find: /\bthe prime minister\b/g,
+    message: 'Capitalise "Prime Minister" when referring to the current incumbent' },
   { id:'c23', category:'Capitalisation', severity:'WARNING',
-    find: /\bthe chancellor\b/gi,
-    message: 'Check capitalisation: "Chancellor" is upper case when referring to the current incumbent' },
+    find: /\bthe chancellor\b/g,
+    message: 'Capitalise "Chancellor" when referring to the current incumbent' },
   { id:'c24', category:'Capitalisation', severity:'WARNING',
-    find: /\bthe home secretary\b/gi,
-    message: 'Check capitalisation: "Home Secretary" is upper case when referring to the current incumbent' },
+    find: /\bthe home secretary\b/g,
+    message: 'Capitalise "Home Secretary" when referring to the current incumbent' },
   { id:'c25', category:'Capitalisation', severity:'WARNING',
-    find: /\bthe speaker\b/gi,
-    message: 'Check capitalisation: "the Speaker" (Commons) is upper case' },
+    find: /\bthe speaker\b/g,
+    message: 'Capitalise "the Speaker" (Commons)' },
   { id:'c26', category:'Capitalisation', severity:'WARNING',
-    find: /\battorney general\b/gi,
-    message: 'Check capitalisation: "Attorney General" is upper case when referring to the current incumbent' },
+    find: /\battorney general\b/g,
+    message: 'Capitalise "Attorney General" when referring to the current incumbent' },
   { id:'c27', category:'Capitalisation', severity:'WARNING',
-    find: /\bchief secretary to the treasury\b/gi,
-    message: 'Check capitalisation: "Chief Secretary to the Treasury" is upper case when referring to the current incumbent' },
+    find: /\bchief secretary to the treasury\b/g,
+    message: 'Capitalise "Chief Secretary to the Treasury" when referring to the current incumbent' },
   { id:'c28', category:'Capitalisation', severity:'WARNING',
-    find: /\bchief whip\b/gi,
-    message: 'Check capitalisation: "Chief Whip" is upper case when referring to the current incumbent' },
+    find: /\bchief whip\b/g,
+    message: 'Capitalise "Chief Whip" when referring to the current incumbent' },
   { id:'c29', category:'Capitalisation', severity:'WARNING',
-    find: /\bsolicitor general\b/gi,
-    message: 'Check capitalisation: "Solicitor General" is upper case when referring to the current incumbent' },
+    find: /\bsolicitor general\b/g,
+    message: 'Capitalise "Solicitor General" when referring to the current incumbent' },
   { id:'c30', category:'Capitalisation', severity:'WARNING',
     find: /\bgovernor of the bank of england\b/gi,
     message: 'Keep "governor of the Bank of England" lowercase — this is not a Cabinet title' },
@@ -1549,7 +1549,14 @@ const RULE_CONFIDENCE = {
 
 const RULE_GUARDS = {
   sx01: (match, text) => !isInsideAnyQuotes(text, match.index),
-  s39: (match, text) => !isSoftwareContext(text, match.index)
+  s39: (match, text) => !isSoftwareContext(text, match.index),
+  n07: (match, text) => {
+    const scope = text.slice(Math.max(0, match.index - 20), match.index + match[0].length + 20);
+    if (/(?:January|February|March|April|May|June|July|August|September|October|November|December)\s*\d|\d\s*(?:January|February|March|April|May|June|July|August|September|October|November|December)/i.test(scope)) {
+      return false;
+    }
+    return true;
+  }
 };
 
 function getConfidence(ruleId, severity) {
@@ -1606,6 +1613,16 @@ function runAcronymFirstMentionChecks(text) {
     const fullMatch = fullRe.exec(text);
 
     if (shortMatch && (!fullMatch || shortMatch.index < fullMatch.index)) {
+      const before = text.slice(0, shortMatch.index);
+      const after = text.slice(shortMatch.index + shortMatch[0].length);
+      const beforeTokenMatch = before.match(/([A-Za-z][A-Za-z'’-]*)[\s\p{P}]*$/u);
+      const afterTokenMatch = after.match(/^[\s\p{P}]*("|“)?([A-Za-z][A-Za-z'’-]*)/u);
+      const beforeToken = beforeTokenMatch ? beforeTokenMatch[1] : '';
+      const afterToken = afterTokenMatch ? afterTokenMatch[2] : '';
+      const titleCaseStopwords = new Set(['A', 'An', 'The', 'This', 'That', 'These', 'Those', 'Our', 'Their', 'His', 'Her', 'Its', 'My', 'Your']);
+      const looksLikeNameToken = token => /^(?:[A-Z][a-z]+(?:['’-][A-Za-z]+)*|[A-Z]{2,})$/.test(token) && !titleCaseStopwords.has(token);
+      if (looksLikeNameToken(beforeToken) || looksLikeNameToken(afterToken)) return;
+
       findings.push({
         ruleId: c.id,
         category: 'Acronyms',
@@ -1961,10 +1978,11 @@ function runGenericAcronymDefinitionChecks(text) {
     const ac = m[0];
     if (seen.has(ac)) continue;
     seen.add(ac);
-    if (/^(UK|US|EU|UN|NHS|MP|BBC|ITV|GDP|VAT|HMRC|HMT|DWP|DfE|DfT|DHSC|FCDO|MHCLG|BEIS|DCMS|FOI)$/.test(ac)) continue;
+    if (/^(UK|US|EU|UN|NHS|MP|BBC|ITV|GDP|VAT|HMRC|HMT|DWP|DfE|DfT|DHSC|FCDO|MHCLG|BEIS|DCMS|FOI|MBE|OBE|CBE|DBE|GBE|KBE|BEM|QPM|QC|KC|JP|MP|MEP|MSP|AM)$/.test(ac)) continue;
     const prior = text.slice(0, m.index);
     const defined = new RegExp(`\\b[^\\n()]{3,80}\\(${ac}\\)`).test(prior);
-    if (!defined) {
+    const definedBeforeOrAtCurrent = new RegExp(`\\b[^\\n()]{3,80}\\(${ac}\\)`).test(text.slice(0, m.index + ac.length + 1));
+    if (!(defined || definedBeforeOrAtCurrent)) {
       findings.push({
         ruleId: 'sx47',
         category: 'Acronyms',
