@@ -72,7 +72,11 @@
     grid-template-columns: 1fr 1fr;
     gap: 24px; align-items: start;
   }
-  @media (max-width: 800px) { .container { grid-template-columns: 1fr; } }
+  @media (max-width: 800px) {
+    .container { grid-template-columns: 1fr; }
+    .results-area { max-height: none; }
+    .issue-compare { grid-template-columns: 1fr; }
+  }
   .panel {
     background: white; border: 1px solid var(--rule);
     box-shadow: 4px 4px 0 var(--parchment), 5px 5px 0 var(--rule);
@@ -143,7 +147,11 @@
   }
   .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mid); flex-shrink: 0; }
   .status-dot.done { background: var(--success); }
-  .results-area { min-height: 400px; }
+  .results-area {
+    min-height: 400px;
+    max-height: 620px;
+    overflow-y: auto;
+  }
 
   .empty-state {
     display: flex; flex-direction: column;
@@ -172,8 +180,10 @@
   .issue-item {
     border-bottom: 1px solid var(--parchment);
     padding: 12px 16px;
-    display: grid; grid-template-columns: auto 1fr;
-    gap: 12px; align-items: start;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: start;
   }
   .issue-item:last-child { border-bottom: none; }
   .issue-item:hover { background: var(--cream); }
@@ -197,13 +207,37 @@
   .confidence-badge.medium { border-color: #d8c16d; color: #7a5a00; background: #fff9e6; }
   .confidence-badge.low { border-color: #b8c6e8; color: #34507d; background: #eef3ff; }
   .issue-text { font-size: 14px; line-height: 1.55; color: var(--ink); margin-bottom: 3px; }
-  .issue-found {
-    font-family: 'DM Mono', monospace; font-size: 11px;
-    color: var(--mid); background: var(--parchment);
-    padding: 3px 8px; border-left: 2px solid var(--gold);
-    margin-top: 5px; display: inline-block;
+  .issue-main { display: grid; gap: 8px; }
+  .issue-meta-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .issue-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 2px;
+  }
+  .issue-compare-col {
+    background: #faf8f2;
+    border: 1px solid var(--parchment);
+    padding: 8px 9px;
+    border-radius: 2px;
+  }
+  .issue-compare-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .issue-snippet {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--ink);
     word-break: break-word;
   }
+  .issue-compare-col.suggested .issue-snippet { color: var(--success); }
   .issue-context {
     font-size: 12px; color: var(--mid); margin-top: 4px;
     font-style: italic; line-height: 1.4;
@@ -410,7 +444,7 @@
     <!-- PREVIEW TAB -->
     <div id="left-tab-preview" class="left-tab-pane">
       <div class="panel-body" style="padding-bottom:0;">
-        <label class="input-label">Highlighted article — click any highlight to jump to issue</label>
+        <label class="input-label">Highlighted article — click any highlight to focus matching issue</label>
         <div id="previewArea" class="preview-area">
           <span style="color:var(--mid);font-style:italic;">Run a check to see highlighted issues here.</span>
         </div>
@@ -2164,18 +2198,28 @@ function renderResults() {
         const conf = (item.confidence || 'medium').toLowerCase();
         const issueId = `issue-${item.ruleId}-${item.index}`;
         const ctx = escHtml(item.context).replace(escHtml(item.found), `<mark class="highlight">${escHtml(item.found)}</mark>`);
-        const suggestedFix = item.suggestedFix ? `<p class="issue-fix">Suggested fix: ${escHtml(item.suggestedFix)}</p>` : '';
         html += `
           <div class="issue-item ${activeIssueId===issueId?'active-issue':''}" id="${issueId}" tabindex="0" onclick="setActiveIssue('${issueId}')">
-            <div><span class="severity-badge ${item.severity.toLowerCase()}">${sevLabel}</span><span class="confidence-badge ${conf}">${conf} confidence</span></div>
-            <div>
+            <div><span class="severity-badge ${item.severity.toLowerCase()}">${sevLabel}</span></div>
+            <div class="issue-main">
+              <div class="issue-meta-row">
+                <span class="confidence-badge ${conf}">${conf} confidence</span>
+              </div>
               <p class="issue-text">${escHtml(item.message)}</p>
-              <div class="issue-found">Found: "${escHtml(item.found)}"</div>
+              <div class="issue-compare">
+                <div class="issue-compare-col found">
+                  <span class="issue-compare-label">Found</span>
+                  <div class="issue-snippet">"${escHtml(item.found)}"</div>
+                </div>
+                <div class="issue-compare-col suggested">
+                  <span class="issue-compare-label">Suggested</span>
+                  <div class="issue-snippet">${item.suggestedFix ? `"${escHtml(item.suggestedFix)}"` : 'No direct replacement. Use message guidance.'}</div>
+                </div>
+              </div>
               <p class="issue-context">${ctx}</p>
-              ${suggestedFix}
               <div class="issue-actions">
                 <button class="issue-action-btn" onclick="dismissIssue('${issueId}');event.stopPropagation();">Dismiss</button>
-                ${item.suggestedFix ? `<button class="issue-action-btn" onclick="copyCorrectedText('${issueId}');event.stopPropagation();">Copy corrected text</button>` : ''}
+                ${item.suggestedFix ? `<button class="issue-action-btn" onclick="acceptAndChange('${issueId}');event.stopPropagation();">Accept and change</button>` : ''}
               </div>
             </div>
           </div>`;
@@ -2299,10 +2343,14 @@ function jumpToIssue(issueId, spanEl) {
     issueEl = document.getElementById(issueId);
   }
 
-  // Scroll to and highlight the issue item
+  // Scroll within results panel and highlight the issue item
   if (issueEl) {
     issueEl.classList.add('active-issue');
-    issueEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const resultsArea = document.getElementById('resultsArea');
+    if (resultsArea) {
+      const targetTop = issueEl.offsetTop - Math.max(20, (resultsArea.clientHeight - issueEl.offsetHeight) / 2);
+      resultsArea.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    }
   } else {
     document.getElementById('statusText').textContent =
       `Could not jump to ${issueId}. Try running Check again.`;
@@ -2326,14 +2374,14 @@ function dismissIssue(issueId) {
   updateFindingStatus();
 }
 
-function copyCorrectedText(issueId) {
+function acceptAndChange(issueId) {
   const finding = allFindings.find(f => `issue-${f.ruleId}-${f.index}` === issueId);
   if (!finding || !finding.suggestedFix) return;
   const textarea = document.getElementById('articleText');
   const corrected = applyReplacementAtIndex(textarea.value, finding, finding.suggestedFix);
   textarea.value = corrected;
   updateMeta();
-  navigator.clipboard.writeText(corrected).catch(() => {});
+  document.getElementById('statusText').textContent = 'Applied suggested change to article text.';
   allFindings = allFindings.map(f => {
     if (f.index <= finding.index) return f;
     return { ...f, index: f.index + finding.suggestedFix.length - finding.found.length };
