@@ -3,5 +3,8 @@ module.exports = [
   { input: 'The adviser will fill in a form.', expectedRuleIds: [] },
   { input: 'This is no-one anymore.', expectedRuleIds: ['s28', 's29'] },
   { input: 'The report mentions GDP and then BBC.', expectedRuleIds: [] },
-  { input: 'A senior adviser discussed the program.', expectedRuleIds: ['s39'] }
+  { input: 'A senior adviser discussed the program.', expectedRuleIds: ['s39'] },
+  { input: 'The Bank of England raised rates.', expectedRuleIds: [] },
+  { input: 'the bank of england raised rates.', expectedRuleIds: ['c31'] },
+  { input: 'Sinn Fein issued a statement.', expectedRuleIds: ['sx41'] }
 ];
